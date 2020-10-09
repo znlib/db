@@ -3,11 +3,11 @@
 Выполнить миграции:
 
     cd vendor/znlib/migration/bin
-    php console db:migrate:up --withConfirm=0
+    php console db:migrate:up
 
 Выполнить иморт демо-данных в БД для разработки:
 
     cd vendor/znlib/fixture/bin
-    php console db:fixture:import --withConfirm=0
+    php console db:fixture:import
 
-Команды выполнятся без подтверждений.
+Для выполнения команд без подтверждений, используйте опцию `--withConfirm=0`.
