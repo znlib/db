@@ -33,22 +33,27 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $this->capsule;
     }
 
+    public function connectionName()
+    {
+        return $this->capsule->getConnectionNameByTableName($this->tableName());
+    }
+
     public function getConnection(): Connection
     {
-        $connection = $this->capsule->getConnection();
+        $connection = $this->capsule->getConnection($this->connectionName());
         return $connection;
     }
 
     protected function getQueryBuilder(): QueryBuilder
     {
         $connection = $this->getConnection();
-        $queryBuilder = $connection->table($this->tableNameAlias(), null, $this->connectionName());
+        $queryBuilder = $connection->table($this->tableNameAlias(), null);
         return $queryBuilder;
     }
 
-    protected function getSchema(string $connectionName = null): SchemaBuilder
+    protected function getSchema(): SchemaBuilder
     {
-        $connection = $this->getConnection($connectionName);
+        $connection = $this->getConnection();
         $schema = $connection->getSchemaBuilder();
         return $schema;
     }

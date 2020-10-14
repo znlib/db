@@ -19,11 +19,17 @@ class Manager extends CapsuleManager
     use ConfigTrait;
 
     private $tableAlias;
+    private $connectionMap = [];
+
+    public function getConnectionNameByTableName(string $tableName) {
+        return ArrayHelper::getValue($this->connectionMap, $tableName, 'default');
+    }
 
     public function __construct(?Container $container = null, $mainConfigFile = null)
     {
         parent::__construct($container);
         $config = $this->loadConfig($mainConfigFile);
+        $this->connectionMap = ArrayHelper::getValue($config, 'connection.connectionMap', []);
         $this->tableAlias = new TableAlias;
         $connections = DbFacade::getConfigFromEnv();
         foreach ($connections as $connectionName => $connectionConfig) {

@@ -2,18 +2,12 @@
 
 namespace ZnLib\Db\Traits;
 
+use ZnCore\Base\Libs\DotEnv\DotEnv;
+
 trait TableNameTrait
 {
 
-    protected $connectionName = 'default';
     protected $tableName;
-
-    //abstract function getCapsule() : Manager;
-
-    public function connectionName(): string
-    {
-        return $this->connectionName;
-    }
 
     public function tableName(): string
     {

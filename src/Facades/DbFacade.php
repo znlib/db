@@ -12,7 +12,7 @@ use ZnLib\Db\Helpers\ConfigHelper;
 class DbFacade
 {
 
-    public static function getConfigFromEnv()
+    public static function getConfigFromEnv(): array
     {
         if (!empty($_ENV['DATABASE_URL'])) {
             $connections['default'] = ConfigHelper::parseDsn($_ENV['DATABASE_URL']);
