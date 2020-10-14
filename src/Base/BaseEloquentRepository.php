@@ -58,6 +58,12 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $schema;
     }
 
+    function getAttributeMap(): array {
+        return [
+
+        ];
+    }
+
     protected function allByBuilder(QueryBuilder $queryBuilder)
     {
         $postCollection = $queryBuilder->get();

@@ -17,7 +17,7 @@ DB_CHARSET=utf8
 #DB_DEFAULT_DEFAULT_SCHEMA=public
 ```
 
-Если каратко, то:
+Если кратко, то:
 
 ```dotenv
 DB_CONNECTION=mysql
@@ -69,6 +69,8 @@ $capsule = new Manager(null, $eloquentConfigFile);
 
 ```yaml
 connection:
+    connectionMap:
+        reference_item: slaveDb
     map:
         article_category: art_category
         article_post: art_post
