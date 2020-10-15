@@ -10,6 +10,7 @@ use ZnLib\Db\Enums\DbDriverEnum;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Helpers\ConfigHelper;
 use ZnLib\Db\Helpers\DbHelper;
+use ZnLib\Db\Libs\ConfigBuilders\EloquentConfigBuilder;
 use ZnLib\Db\Libs\TableAlias;
 use ZnLib\Fixture\Domain\Traits\ConfigTrait;
 
@@ -36,11 +37,10 @@ class Manager extends CapsuleManager
             if (!isset($connectionConfig['map'])) {
                 $connectionConfig['map'] = ArrayHelper::getValue($config, 'connection.map', []);
             }
-            $connectionConfig['database'] = $connectionConfig['dbname'];
             if ($connectionConfig['driver'] == DbDriverEnum::SQLITE) {
                 FileHelper::touch($connectionConfig['database']);
             }
-            $this->addConnection($connectionConfig);
+            $this->addConnection(EloquentConfigBuilder::build($connectionConfig), $connectionName);
             $map = ArrayHelper::getValue($connectionConfig, 'map', []);
             if ($connectionConfig['driver'] !== DbDriverEnum::PGSQL) {
                 foreach ($map as $from => &$to) {

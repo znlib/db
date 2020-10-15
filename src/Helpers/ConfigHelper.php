@@ -16,48 +16,29 @@ class ConfigHelper
         $connectionCofig = [
             'driver' => ArrayHelper::getValue($dsnConfig, 'scheme'),
             'host' => ArrayHelper::getValue($dsnConfig, 'host', '127.0.0.1'),
-            'dbname' => trim(ArrayHelper::getValue($dsnConfig, 'path'), '/'),
+            'database' => trim(ArrayHelper::getValue($dsnConfig, 'path'), '/'),
             'username' => ArrayHelper::getValue($dsnConfig, 'user'),
             'password' => ArrayHelper::getValue($dsnConfig, 'pass'),
         ];
         return $connectionCofig;
     }
 
-    public static function buildConfigForPdo(array $config): array
-    {
-        if ($config['driver'] == DbDriverEnum::SQLITE) {
-            return [
-                'dsn' => 'sqlite:' . $config['dbname'],
-            ];
-        } else {
-            $dsnArray[] = "{$config['driver']}:host={$config['host']}";
-            foreach ($config as $configName => $configValue) {
-                if (!empty($configValue) && !in_array($configName, ['driver', 'host', 'username', 'password'])) {
-                    $dsnArray[] = "$configName=$configValue";
-                }
-            }
-            return [
-                "username" => $config['username'] ?? '',
-                "password" => $config['password'] ?? '',
-                "dsn" => implode(';', $dsnArray),
-            ];
-        }
-    }
+
 
     public static function prepareConfig($connection)
     {
-        $connection['driver'] = $connection['driver'] ?? $connection['connection'];
-        $connection['dbname'] = $connection['dbname'] ?? $connection['database'];
-
-        $connection['host'] = $connection['host'] ?? '127.0.0.1';
-        $connection['driver'] = $connection['driver'] ?? 'mysql';
-
-        if (!empty($connection['dbname'])) {
-            $connection['dbname'] = rtrim($connection['dbname'], '/');
+        if (!empty($connection['database'])) {
+            $connection['database'] = rtrim($connection['database'], '/');
         }
 
-        unset($connection['database']);
-        unset($connection['connection']);
+        if (!empty($connection['read']['host'])) {
+
+            $connection['read']['host'] = explode(',', $connection['read']['host']);
+        }
+
+        if (!empty($connection['write']['host'])) {
+            $connection['write']['host'] = explode(',', $connection['write']['host']);
+        }
 
         return $connection;
     }

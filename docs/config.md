@@ -7,20 +7,40 @@
 Добавьте переменные окружения
 
 ```dotenv
-DB_CONNECTION=mysql #DB_CONNECTION | DB_DRIVER
+DB_DRIVER=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=
-DB_DATABASE=symfony-tpl # DB_DATABASE | DB_DBNAME
+DB_DATABASE=symfony-tpl
 DB_CHARSET=utf8
-#DB_DEFAULT_DEFAULT_SCHEMA=public
+#DB_READ_HOST=127.0.0.1,196.168.1.2
+#DB_WRITE_HOST=127.0.0.1
+#DB_DEFAULT_SCHEMA=public
+```
+
+Можно конфигурировать несколько подключений к БД:
+
+```dotenv
+DB_DEFAULT_DRIVER=pgsql
+DB_DEFAULT_USERNAME=postgres
+DB_DEFAULT_PASSWORD=postgres
+DB_DEFAULT_DATABASE=symfony-tpl
+DB_DEFAULT_READ_HOST=127.0.0.1,196.168.1.2
+DB_DEFAULT_WRITE_HOST=127.0.0.1
+
+DB_SHOP_DRIVER=pgsql
+DB_SHOP_USERNAME=postgres
+DB_SHOP_PASSWORD=postgres
+DB_SHOP_DATABASE=symfony-tpl
+DB_SHOP_READ_HOST=127.0.0.1,196.168.1.2
+DB_SHOP_WRITE_HOST=127.0.0.1
 ```
 
 Если кратко, то:
 
 ```dotenv
-DB_CONNECTION=mysql
+DB_DRIVER=mysql
 DB_USERNAME=root
 DB_PASSWORD=qwerty
 DB_DATABASE=symfony-tpl

@@ -4,6 +4,7 @@ namespace ZnLib\Db\Yii2\Components;
 
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Helpers\ConfigHelper;
+use ZnLib\Db\Libs\ConfigBuilders\YiiConfigBuilder;
 
 class Connection extends \yii\db\Connection
 {
@@ -15,8 +16,7 @@ class Connection extends \yii\db\Connection
     {
         if (empty($config)) {
             $connections = DbFacade::getConfigFromEnv();
-            $config = $connections['default'];
-            $config = ConfigHelper::buildConfigForPdo($config);
+            $config = YiiConfigBuilder::build($connections['default']);
         }
         parent::__construct($config);
     }
