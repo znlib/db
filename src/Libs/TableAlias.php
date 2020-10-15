@@ -30,45 +30,4 @@ class TableAlias
         return $sourceTableName;
     }
 
-    public function getLocalName(string $tableName, array $map = null)
-    {
-        if (isset($map)) {
-            $map = array_flip($map);
-            $globalName = ArrayHelper::getValue($map, $tableName);
-        } else {
-            $this->loadMap();
-            $map = array_flip($this->map);
-            $globalName = ArrayHelper::getValue($map, $tableName);
-        }
-        if ($globalName) {
-            $tableName = $globalName;
-        }
-        return $tableName;
-    }
-
-    public function getGlobalName(string $tableName, array $map = null)
-    {
-        if (isset($map)) {
-            $globalName = ArrayHelper::getValue($map, $tableName);
-        } else {
-            $this->loadMap();
-            $globalName = ArrayHelper::getValue($this->map, $tableName);
-        }
-        if ($globalName) {
-            $tableName = $globalName;
-        }
-        return $tableName;
-    }
-
-    private function loadMap()
-    {
-        if ($this->map === null) {
-            $config = EnvService::getConnection('main');
-            if ($config['driver'] == 'pgsql') {
-                $this->map = ArrayHelper::getValue($config, 'map', []);
-            } else {
-                $this->map = [];
-            }
-        }
-    }
 }
