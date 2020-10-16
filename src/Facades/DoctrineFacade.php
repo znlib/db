@@ -34,5 +34,4 @@ class DoctrineFacade
         $connection = DriverManager::getConnection($connectionConfig, $config);
         return $connection;
     }
-
 }
