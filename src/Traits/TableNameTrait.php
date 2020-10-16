@@ -9,6 +9,11 @@ trait TableNameTrait
 
     protected $tableName;
 
+    public function connectionName()
+    {
+        return $this->capsule->getConnectionNameByTableName($this->tableName());
+    }
+
     public function tableName(): string
     {
         return $this->tableName;

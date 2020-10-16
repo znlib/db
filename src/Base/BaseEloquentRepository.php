@@ -33,11 +33,6 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $this->capsule;
     }
 
-    public function connectionName()
-    {
-        return $this->capsule->getConnectionNameByTableName($this->tableName());
-    }
-
     public function getConnection(): Connection
     {
         $connection = $this->capsule->getConnection($this->connectionName());

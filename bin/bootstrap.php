@@ -2,15 +2,16 @@
 
 use Symfony\Component\Console\Application;
 use ZnLib\Db\Capsule\Manager;
+use Illuminate\Container\Container;
+use ZnLib\Console\Symfony4\Helpers\CommandHelper;
 
 /**
  * @var Application $application
+ * @var Container $container
  */
 
-$capsule = \ZnLib\Db\Factories\ManagerFactory::createManagerFromEnv();
+$capsule = $container->get(Manager::class);
 
-use ZnLib\Db\Commands\DeleteAllTablesCommand;
-
-// создаем и объявляем команду "deleteAllTables"
-$deleteAllTablesCommand = new DeleteAllTablesCommand(DeleteAllTablesCommand::getDefaultName(), $fixtureService);
-$application->add($deleteAllTablesCommand);
+CommandHelper::registerFromNamespaceList([
+    'ZnLib\Db\Commands',
+], $container);
