@@ -3,7 +3,7 @@
 namespace ZnLib\Db\Libs;
 
 use Illuminate\Support\Collection;
-use ZnSandbox\Sandbox\Eav\Domain\Repositories\Eloquent\FieldRepository;
+use ZnBundle\Eav\Domain\Repositories\Eloquent\FieldRepository;
 use php7rails\domain\repositories\BaseRepository;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Domain\Helpers\Repository\RelationHelper;
