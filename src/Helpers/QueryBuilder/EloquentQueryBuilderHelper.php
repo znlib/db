@@ -37,6 +37,16 @@ class EloquentQueryBuilderHelper implements QueryBuilderInterface
         }
     }
 
+    public static function setJoin(Query $query, Builder $queryBuilder)
+    {
+        $queryArr = $query->toArray();
+        if ( ! empty($queryArr[Query::JOIN])) {
+            foreach ($queryArr[Query::JOIN] as $key => $value) {
+                $queryBuilder->join($value['table'], $value['on'][0], '=', $value['on'][1], $value['type']);
+            }
+        }
+    }
+
     public static function setOrder(Query $query, Builder $queryBuilder)
     {
         $queryArr = $query->toArray();

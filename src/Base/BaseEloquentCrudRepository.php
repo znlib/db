@@ -48,6 +48,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         $query = $this->forgeQuery($query);
         $queryBuilder = $this->getQueryBuilder();
         EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         return $queryBuilder->count();
     }
 
@@ -55,7 +56,9 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
         $query = $this->forgeQuery($query);
         $queryBuilder = $this->getQueryBuilder();
+        $query->select([$queryBuilder->from . '.*']);
         EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
         EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
         EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
