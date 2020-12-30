@@ -5,6 +5,8 @@ namespace ZnLib\Db\Base;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Collection;
+use ZnCore\Domain\Libs\EntityManager;
 use ZnLib\Db\Capsule\Manager;
 use ZnLib\Db\Traits\TableNameTrait;
 use ZnCore\Domain\Helpers\EntityHelper;
@@ -17,15 +19,22 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 
     protected $autoIncrement = 'id';
     private $capsule;
+    private $em;
 
-    public function __construct(Manager $capsule)
+    public function __construct(EntityManager $em, Manager $capsule)
     {
         $this->capsule = $capsule;
+        $this->em = $em;
     }
 
     public function autoIncrement()
     {
         return $this->autoIncrement;
+    }
+
+    protected function getEntityManager(): EntityManager
+    {
+        return $this->em;
     }
 
     public function getCapsule(): Manager
@@ -59,14 +68,14 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         ];
     }
 
-    protected function allByBuilder(QueryBuilder $queryBuilder)
+    protected function allByBuilder(QueryBuilder $queryBuilder): Collection
     {
         $postCollection = $queryBuilder->get();
         $array = $postCollection->toArray();
-        //return $this->forgeEntityCollection($array);
 
         $entityClass = $this->getEntityClass();
-        return EntityHelper::createEntityCollection($entityClass, $array);
+        return $this->getEntityManager()->createEntityCollection($entityClass, $array);
+//        return EntityHelper::createEntityCollection($entityClass, $array);
     }
 
     /*public function getEntityClass(): string
