@@ -3,10 +3,15 @@
 namespace ZnLib\Db\Base;
 
 use Illuminate\Database\QueryException;
+use ZnCore\Domain\Entities\Query\Where;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
+use ZnCore\Domain\Helpers\QueryHelper;
+use ZnCore\Domain\Helpers\ValidationHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
+use ZnCore\Domain\Interfaces\Entity\ValidateEntityInterface;
+use ZnCore\Domain\Interfaces\ForgeQueryByFilterInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Base\Exceptions\NotFoundException;
@@ -14,7 +19,7 @@ use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
 
-abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface
+abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface
 {
 
     protected $primaryKey = ['id'];
@@ -35,6 +40,12 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $query;
     }
 
+    public function forgeQueryByFilter(ValidateEntityInterface $filterModel, Query $query = null)
+    {
+        $query = $this->forgeQuery($query);
+        QueryHelper::forgeQueryByFilter($query, $filterModel);
+    }
+    
     protected function queryFilterInstance(Query $query = null)
     {
         $query = $this->forgeQuery($query);
