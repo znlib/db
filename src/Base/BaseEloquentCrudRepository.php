@@ -90,7 +90,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     public function oneById($id, Query $query = null): EntityIdInterface
     {
         $query = $this->forgeQuery($query);
-        $query->where('id', $id);
+        $query->where($this->primaryKey[0], $id);
         return $this->one($query);
     }
 
@@ -180,5 +180,4 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         }
         $queryBuilder->delete();
     }
-
 }
