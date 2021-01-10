@@ -172,6 +172,25 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         $queryBuilder->delete($id);
     }
 
+    public function updateByQuery(Query $query, array $values)
+    {
+        $query = $this->forgeQuery($query);
+        $queryFilter = $this->queryFilterInstance($query);
+        $queryWithoutRelations = $queryFilter->getQueryWithoutRelations();
+//        $collection = $this->_all($queryWithoutRelations);
+        $query = $this->forgeQuery($query);
+        $queryBuilder = $this->getQueryBuilder();
+        $query->select([$queryBuilder->from . '.*']);
+        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
+        $queryBuilder->update($values);
+//        $collection = $this->allByBuilder($queryBuilder);
+//        return $collection;
+    }
+
     public function deleteByCondition(array $condition)
     {
         $queryBuilder = $this->getQueryBuilder();
