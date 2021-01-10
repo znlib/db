@@ -106,6 +106,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function create(EntityIdInterface $entity)
     {
+        ValidationHelper::validateEntity($entity);
         $columnList = $this->getColumnsForModify();
         $arraySnakeCase = EntityHelper::toArrayForTablize($entity, $columnList);
         $queryBuilder = $this->getQueryBuilder();
@@ -144,6 +145,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function update(EntityIdInterface $entity)
     {
+        ValidationHelper::validateEntity($entity);
         $this->oneById($entity->getId());
         $data = EntityHelper::toArrayForTablize($entity);
         $this->updateQuery($entity->getId(), $data);
