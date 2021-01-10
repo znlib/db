@@ -6,11 +6,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
-use ZnCore\Domain\Libs\EntityManager;
+use ZnCore\Domain\Interfaces\GetEntityClassInterface;
+use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnLib\Db\Capsule\Manager;
 use ZnLib\Db\Traits\TableNameTrait;
-use ZnCore\Domain\Helpers\EntityHelper;
-use ZnCore\Domain\Interfaces\GetEntityClassInterface;
 
 abstract class BaseEloquentRepository implements GetEntityClassInterface
 {
@@ -21,7 +20,7 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
     private $capsule;
     private $em;
 
-    public function __construct(EntityManager $em, Manager $capsule)
+    public function __construct(EntityManagerInterface $em, Manager $capsule)
     {
         $this->capsule = $capsule;
         $this->em = $em;
@@ -32,7 +31,7 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $this->autoIncrement;
     }
 
-    protected function getEntityManager(): EntityManager
+    protected function getEntityManager(): EntityManagerInterface
     {
         return $this->em;
     }
