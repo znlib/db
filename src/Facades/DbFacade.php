@@ -6,7 +6,7 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
-use ZnCore\Base\Libs\DotEnv\DotEnv;
+use ZnCore\Base\Libs\DotEnv\DotEnvFacade;
 use ZnLib\Db\Helpers\ConfigHelper;
 
 class DbFacade
@@ -17,7 +17,7 @@ class DbFacade
         if (!empty($_ENV['DATABASE_URL'])) {
             $connections['default'] = ConfigHelper::parseDsn($_ENV['DATABASE_URL']);
         } else {
-            $config = DotEnv::get('db');
+            $config = DotEnvFacade::get('db');
             $isFlatConfig = !is_array(ArrayHelper::first($config));
             if ($isFlatConfig) {
                 $connections['default'] = $config;
