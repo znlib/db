@@ -128,7 +128,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         }
     }
 
-    private function getColumnsForModify()
+    protected function getColumnsForModify()
     {
         $schema = $this->getSchema();
         $columnList = $schema->getColumnListing($this->tableNameAlias());
