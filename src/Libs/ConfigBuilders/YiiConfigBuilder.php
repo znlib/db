@@ -16,11 +16,12 @@ class YiiConfigBuilder
         return $connection;
     }
 
-    public static function buildConfigForPdo(array $config): array
+    private static function buildConfigForPdo(array $config): array
     {
         if ($config['driver'] == DbDriverEnum::SQLITE) {
+//            dd($config);
             return [
-                'dsn' => 'sqlite:' . $config['database'],
+                'dsn' => 'sqlite:' . $config['dbname'],
             ];
         } else {
             $dsnArray[] = "{$config['driver']}:host={$config['host']}";
