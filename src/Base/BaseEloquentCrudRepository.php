@@ -3,6 +3,7 @@
 namespace ZnLib\Db\Base;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use ZnCore\Domain\Entities\Query\Where;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
@@ -127,7 +128,18 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             throw $errors;
         }
     }
-
+    
+    public function createCollection(Collection $collection)
+    {
+        $array = [];
+        foreach ($collection as $entity) {
+            ValidationHelper::validateEntity($entity);
+            $columnList = $this->getColumnsForModify();
+            $array[] = EntityHelper::toArrayForTablize($entity, $columnList);
+        }
+        $this->getQueryBuilder()->insert($array);
+    }
+    
     protected function getColumnsForModify()
     {
         $schema = $this->getSchema();
