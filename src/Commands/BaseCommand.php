@@ -12,12 +12,9 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 abstract class BaseCommand extends Command
 {
 
-    protected $fixtureService;
-
-    public function __construct(?string $name = null, FixtureService $fixtureService)
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
-        $this->fixtureService = $fixtureService;
     }
 
     protected function configure()
