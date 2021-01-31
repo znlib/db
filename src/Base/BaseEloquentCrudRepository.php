@@ -41,7 +41,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $query;
     }
 
-    public function forgeQueryByFilter(ValidateEntityInterface $filterModel, Query $query = null)
+    public function forgeQueryByFilter(object $filterModel, Query $query = null)
     {
         $query = $this->forgeQuery($query);
         QueryHelper::forgeQueryByFilter($query, $filterModel);
