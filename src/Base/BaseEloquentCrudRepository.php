@@ -4,19 +4,17 @@ namespace ZnLib\Db\Base;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
-use ZnCore\Domain\Entities\Query\Where;
+use ZnCore\Base\Exceptions\NotFoundException;
+use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnCore\Domain\Helpers\QueryHelper;
 use ZnCore\Domain\Helpers\ValidationHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
-use ZnCore\Domain\Interfaces\Entity\ValidateEntityInterface;
 use ZnCore\Domain\Interfaces\ForgeQueryByFilterInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Libs\Query;
-use ZnCore\Base\Exceptions\NotFoundException;
-use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
 
