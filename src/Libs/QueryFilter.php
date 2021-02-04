@@ -4,7 +4,6 @@ namespace ZnLib\Db\Libs;
 
 use Illuminate\Support\Collection;
 use ZnBundle\Eav\Domain\Repositories\Eloquent\FieldRepository;
-use php7rails\domain\repositories\BaseRepository;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Domain\Helpers\Repository\RelationHelper;
 use ZnCore\Domain\Helpers\Repository\RelationWithHelper;
@@ -16,7 +15,7 @@ class QueryFilter
 {
 
     /**
-     * @var BaseRepository|RelationConfigInterface
+     * @var RelationConfigInterface
      */
     private $repository;
     private $query;
