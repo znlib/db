@@ -6,7 +6,11 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
+use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
+use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
+use ZnCore\Domain\Events\EntityEvent;
+use ZnCore\Domain\Events\QueryEvent;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnCore\Domain\Helpers\QueryHelper;
@@ -20,6 +24,8 @@ use ZnLib\Db\Libs\QueryFilter;
 
 abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface
 {
+
+    use EventDispatcherTrait;
 
     protected $primaryKey = ['id'];
 
@@ -41,8 +47,12 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function forgeQueryByFilter(object $filterModel, Query $query = null)
     {
+        QueryHelper::validateFilter($filterModel);
         $query = $this->forgeQuery($query);
-        QueryHelper::forgeQueryByFilter($query, $filterModel);
+        $event = new QueryEvent($query);
+        $event->setFilterModel($filterModel);
+        $this->getEventDispatcher()->dispatch($event, EventEnum::BEFORE_FORGE_QUERY_BY_FILTER);
+//        QueryHelper::forgeQueryByFilter($query, $filterModel);
     }
     
     protected function queryFilterInstance(Query $query = null)
