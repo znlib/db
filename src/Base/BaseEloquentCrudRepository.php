@@ -13,6 +13,7 @@ use ZnCore\Domain\Events\EntityEvent;
 use ZnCore\Domain\Events\QueryEvent;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
+use ZnCore\Domain\Helpers\FilterModelHelper;
 use ZnCore\Domain\Helpers\QueryHelper;
 use ZnCore\Domain\Helpers\ValidationHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
@@ -47,12 +48,13 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function forgeQueryByFilter(object $filterModel, Query $query = null)
     {
-        QueryHelper::validateFilter($filterModel);
+        FilterModelHelper::validate($filterModel);
+        FilterModelHelper::forgeOrder($query, $filterModel);
         $query = $this->forgeQuery($query);
         $event = new QueryEvent($query);
         $event->setFilterModel($filterModel);
         $this->getEventDispatcher()->dispatch($event, EventEnum::BEFORE_FORGE_QUERY_BY_FILTER);
-//        QueryHelper::forgeQueryByFilter($query, $filterModel);
+//        FilterModelHelper::forgeQueryByFilter($query, $filterModel);
     }
     
     protected function queryFilterInstance(Query $query = null)
