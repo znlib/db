@@ -54,7 +54,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         $event = new QueryEvent($query);
         $event->setFilterModel($filterModel);
         $this->getEventDispatcher()->dispatch($event, EventEnum::BEFORE_FORGE_QUERY_BY_FILTER);
-//        FilterModelHelper::forgeQueryByFilter($query, $filterModel);
+        FilterModelHelper::forgeCondition($query, $filterModel);
     }
     
     protected function queryFilterInstance(Query $query = null)
