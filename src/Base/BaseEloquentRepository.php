@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
 use ZnCore\Domain\Interfaces\GetEntityClassInterface;
 use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
+use ZnCore\Domain\Traits\EntityManagerTrait;
 use ZnLib\Db\Capsule\Manager;
 use ZnLib\Db\Traits\TableNameTrait;
 
@@ -15,25 +16,21 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 {
 
     use TableNameTrait;
+    use EntityManagerTrait;
 
     protected $autoIncrement = 'id';
     private $capsule;
-    private $em;
+    private $entityClassName;
 
     public function __construct(EntityManagerInterface $em, Manager $capsule)
     {
         $this->capsule = $capsule;
-        $this->em = $em;
+        $this->setEntityManager($em);
     }
 
     public function autoIncrement()
     {
         return $this->autoIncrement;
-    }
-
-    protected function getEntityManager(): EntityManagerInterface
-    {
-        return $this->em;
     }
 
     public function getCapsule(): Manager
@@ -77,10 +74,15 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 //        return EntityHelper::createEntityCollection($entityClass, $array);
     }
 
-    /*public function getEntityClass(): string
+    public function setEntityClass(object $entityClass): void
     {
-        return $this->entityClass;
-    }*/
+        $this->entityClassName = $entityClass;
+    }
+
+    public function getEntityClass(): string
+    {
+        return $this->entityClassName;
+    }
 
     /*protected function oneByBuilder(QueryBuilder $queryBuilder)
     {
