@@ -98,6 +98,13 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $collection;
     }
 
+    public function loadRelations(Collection $collection, array $with) {
+        $query = $this->forgeQuery();
+        $query->with($with);
+        $queryFilter = $this->queryFilterInstance($query);
+        $queryFilter->loadRelations($collection);
+    }
+
     public function oneById($id, Query $query = null): EntityIdInterface
     {
         $query = $this->forgeQuery($query);
