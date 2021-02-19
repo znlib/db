@@ -66,7 +66,7 @@ ELOQUENT_CONFIG_FILE=config/eloquent/main.yaml
 
 ```yaml
 services:
-    ZnCore\Db\Helpers\Manager:
+    ZnLib\Db\Helpers\Manager:
         arguments:
             $mainConfigFile: '%env(ELOQUENT_CONFIG_FILE)%'
 ```
