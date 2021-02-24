@@ -6,6 +6,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
+use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
@@ -56,7 +57,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         $this->getEventDispatcher()->dispatch($event, EventEnum::BEFORE_FORGE_QUERY_BY_FILTER);
         FilterModelHelper::forgeCondition($query, $filterModel);
     }
-    
+
     protected function queryFilterInstance(Query $query = null)
     {
         $query = $this->forgeQuery($query);
@@ -145,7 +146,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             throw $errors;
         }
     }
-    
+
     public function createCollection(Collection $collection)
     {
         $array = [];
@@ -156,11 +157,18 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         }
         $this->getQueryBuilder()->insert($array);
     }
-    
+
     protected function getColumnsForModify()
     {
         $schema = $this->getSchema();
         $columnList = $schema->getColumnListing($this->tableNameAlias());
+        if (empty($columnList)) {
+            $columnList = EntityHelper::getAttributeNames($this->getEntityClass());
+            foreach ($columnList as &$item) {
+                $item = Inflector::underscore($item);
+            }
+
+        }
         if ($this->autoIncrement()) {
             ArrayHelper::removeByValue($this->autoIncrement(), $columnList);
         }
