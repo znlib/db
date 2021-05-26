@@ -68,9 +68,18 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
     {
         $postCollection = $queryBuilder->get();
         $array = $postCollection->toArray();
-
-        $entityClass = $this->getEntityClass();
-        return $this->getEntityManager()->createEntityCollection($entityClass, $array);
+        $mapper = $this->mapper();
+        if($mapper) {
+            $collection = new Collection();
+            foreach ($array as $item) {
+                $entity = $mapper->decode((array)$item);
+                $collection->add($entity);
+            }
+        } else {
+            $entityClass = $this->getEntityClass();
+            $collection = $this->getEntityManager()->createEntityCollection($entityClass, $array);
+        }
+        return $collection;
 //        return EntityHelper::createEntityCollection($entityClass, $array);
     }
 
