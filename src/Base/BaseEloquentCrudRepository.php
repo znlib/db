@@ -8,6 +8,7 @@ use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
+use ZnCore\Contract\Mapper\MapperInterface;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Events\EntityEvent;
@@ -123,11 +124,20 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $collection->first();
     }
 
+    public function mapper(): ?MapperInterface {
+        return null;
+    }
+
     public function create(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
         $columnList = $this->getColumnsForModify();
-        $arraySnakeCase = EntityHelper::toArrayForTablize($entity, $columnList);
+        $mapper = $this->mapper();
+        if($mapper) {
+            $arraySnakeCase = $mapper->encode($entity);
+        } else {
+            $arraySnakeCase = EntityHelper::toArrayForTablize($entity, $columnList);
+        }
         $queryBuilder = $this->getQueryBuilder();
         try {
             $lastId = $queryBuilder->insertGetId($arraySnakeCase);
