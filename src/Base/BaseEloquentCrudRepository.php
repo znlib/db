@@ -8,7 +8,7 @@ use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
-use ZnCore\Contract\Mapper\MapperInterface;
+use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Events\EntityEvent;

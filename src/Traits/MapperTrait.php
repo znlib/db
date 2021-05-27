@@ -4,7 +4,7 @@ namespace ZnLib\Db\Traits;
 
 use Illuminate\Support\Collection;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
-use ZnCore\Contract\Mapper\MapperInterface;
+use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
 use ZnLib\Db\Mappers\DefaultMapper;
 
