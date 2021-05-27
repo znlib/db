@@ -60,11 +60,11 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $schema;
     }
 
-    function getAttributeMap(): array {
+    /*function getAttributeMap(): array {
         return [
 
         ];
-    }
+    }*/
 
     protected function allByBuilder(QueryBuilder $queryBuilder): Collection
     {
