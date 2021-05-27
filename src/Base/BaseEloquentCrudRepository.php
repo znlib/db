@@ -24,11 +24,13 @@ use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
+use ZnLib\Db\Traits\MapperTrait;
 
 abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface
 {
 
     use EventDispatcherTrait;
+
 
     protected $primaryKey = ['id'];
 
@@ -124,20 +126,10 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $collection->first();
     }
 
-    public function mapper(): ?MapperInterface {
-        return null;
-    }
-
     public function create(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
-        $columnList = $this->getColumnsForModify();
-        $mapper = $this->mapper();
-        if($mapper) {
-            $arraySnakeCase = $mapper->encode($entity);
-        } else {
-            $arraySnakeCase = EntityHelper::toArrayForTablize($entity, $columnList);
-        }
+        $arraySnakeCase = $this->mapperEncodeEntity($entity);
         $queryBuilder = $this->getQueryBuilder();
         try {
             $lastId = $queryBuilder->insertGetId($arraySnakeCase);
@@ -194,7 +186,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
         ValidationHelper::validateEntity($entity);
         $this->oneById($entity->getId());
-        $data = EntityHelper::toArrayForTablize($entity);
+        $data = $this->mapperEncodeEntity($entity);
         $this->updateQuery($entity->getId(), $data);
         //$this->updateById($entity->getId(), $data);
     }

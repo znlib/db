@@ -10,6 +10,7 @@ use ZnCore\Domain\Interfaces\GetEntityClassInterface;
 use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnCore\Domain\Traits\EntityManagerTrait;
 use ZnLib\Db\Capsule\Manager;
+use ZnLib\Db\Traits\MapperTrait;
 use ZnLib\Db\Traits\TableNameTrait;
 
 abstract class BaseEloquentRepository implements GetEntityClassInterface
@@ -17,6 +18,7 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 
     use TableNameTrait;
     use EntityManagerTrait;
+    use MapperTrait;
 
     protected $autoIncrement = 'id';
     private $capsule;
@@ -68,19 +70,8 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
     {
         $postCollection = $queryBuilder->get();
         $array = $postCollection->toArray();
-        $mapper = $this->mapper();
-        if($mapper) {
-            $collection = new Collection();
-            foreach ($array as $item) {
-                $entity = $mapper->decode((array)$item);
-                $collection->add($entity);
-            }
-        } else {
-            $entityClass = $this->getEntityClass();
-            $collection = $this->getEntityManager()->createEntityCollection($entityClass, $array);
-        }
+        $collection = $this->mapperDecodeCollection($array);
         return $collection;
-//        return EntityHelper::createEntityCollection($entityClass, $array);
     }
 
     public function setEntityClass(object $entityClass): void
