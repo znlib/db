@@ -2,7 +2,6 @@
 
 namespace ZnLib\Db\Mappers;
 
-use App\Settings\Domain\Entities\SystemEntity;
 use ZnCore\Base\Helpers\ClassHelper;
 use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Helpers\EntityHelper;
