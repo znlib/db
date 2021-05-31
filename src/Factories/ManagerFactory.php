@@ -2,7 +2,6 @@
 
 namespace ZnLib\Db\Factories;
 
-use http\Params;
 use ZnCore\Base\Helpers\LoadHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
