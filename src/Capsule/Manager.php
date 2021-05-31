@@ -3,6 +3,9 @@
 namespace ZnLib\Db\Capsule;
 
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnLib\Db\Libs\TableAlias;
 
@@ -31,6 +34,48 @@ class Manager extends CapsuleManager
     {
         return $this->tableAlias;
     }
+
+
+
+
+    public function getSchemaByConnectionName($connectionName): SchemaBuilder
+    {
+        //$connection = $this->getConnectionByTableName($tableName);
+        $connection = $this->getConnection($connectionName);
+        $schema = $connection->getSchemaBuilder();
+        return $schema;
+    }
+
+    public function getQueryBuilderByConnectionName($connectionName, string $tableNameAlias): QueryBuilder
+    {
+        $connection = $this->getConnection($connectionName);
+        $queryBuilder = $connection->table($tableNameAlias, null);
+        return $queryBuilder;
+    }
+
+    public function getConnectionByTableName(string $tableName): Connection
+    {
+        $connectionName = $this->getConnectionNameByTableName($tableName);
+        $connection = $this->getConnection($connectionName);
+        return $connection;
+    }
+
+    public function getSchemaByTableName($tableName): SchemaBuilder
+    {
+        $connection = $this->getConnectionByTableName($tableName);
+        $schema = $connection->getSchemaBuilder();
+        return $schema;
+    }
+
+    public function getConnectionNames(): array {
+        $connections = array_values($this->getConnectionMap());
+        $connections[] = 'default';
+        $connections = array_unique($connections);
+        $connections = array_values($connections);
+        return $connections;
+    }
+
+
 
     public function getConnectionNameByTableName(string $tableName)
     {
