@@ -12,11 +12,11 @@ class Connection extends \yii\db\Connection
     public $charset = 'utf8';
     public $enableSchemaCache = YII_ENV_PROD;
 
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], $connectionName = "default")
     {
         if (empty($config)) {
             $connections = DbFacade::getConfigFromEnv();
-            $config = YiiConfigBuilder::build($connections['default']);
+            $config = YiiConfigBuilder::build($connections[$connectionName]);
         }
         parent::__construct($config);
     }
