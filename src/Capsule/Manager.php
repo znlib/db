@@ -75,7 +75,10 @@ class Manager extends CapsuleManager
         return $connections;
     }
 
-
+    public function isInOneDatabase(string $tableName1, string $tableName2): bool
+    {
+        return ArrayHelper::getValue($this->connectionMap, $tableName1, 'default') == ArrayHelper::getValue($this->connectionMap, $tableName2, 'default');
+    }
 
     public function getConnectionNameByTableName(string $tableName)
     {
