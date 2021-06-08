@@ -34,7 +34,7 @@ class ManagerFactory
         return $capsule;
     }
 
-    private static function touchSqlite(array $connections)
+    public static function touchSqlite(array $connections)
     {
         foreach ($connections as $connectionName => $connectionConfig) {
             if ($connectionConfig['driver'] == DbDriverEnum::SQLITE) {
@@ -43,7 +43,7 @@ class ManagerFactory
         }
     }
 
-    private static function createTableAlias(array $connections, array $configMap): TableAlias
+    public static function createTableAlias(array $connections, array $configMap): TableAlias
     {
         $tableAlias = new TableAlias;
         foreach ($connections as $connectionName => $connectionConfig) {
