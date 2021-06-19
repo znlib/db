@@ -5,6 +5,7 @@ namespace ZnLib\Db\Base;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\NotFoundException;
+use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
@@ -151,6 +152,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function createCollection(Collection $collection)
     {
+        DeprecateHelper::softThrow();
         $array = [];
         foreach ($collection as $entity) {
             ValidationHelper::validateEntity($entity);
