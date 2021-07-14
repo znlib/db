@@ -3,6 +3,7 @@
 namespace ZnLib\Db\Helpers\QueryBuilder;
 
 use Illuminate\Database\Query\Builder;
+use ZnCore\Domain\Entities\Query\Join;
 use ZnLib\Db\Helpers\DbHelper;
 use ZnLib\Db\Interfaces\QueryBuilderInterface;
 use ZnCore\Domain\Libs\Query;
@@ -40,6 +41,12 @@ class EloquentQueryBuilderHelper implements QueryBuilderInterface
     public static function setJoin(Query $query, Builder $queryBuilder)
     {
         $queryArr = $query->toArray();
+        if ( ! empty($queryArr['join_new'])) {
+            /** @var Join $join */
+            foreach ($queryArr['join_new'] as $join) {
+                $queryBuilder->join($join->table, $join->first, $join->operator, $join->second, $join->type, $join->where);
+            }
+        }
         if ( ! empty($queryArr[Query::JOIN])) {
             foreach ($queryArr[Query::JOIN] as $key => $value) {
                 $queryBuilder->join($value['table'], $value['on'][0], '=', $value['on'][1], $value['type']);
