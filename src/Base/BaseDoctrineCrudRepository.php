@@ -10,21 +10,22 @@ use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
+//use ZnCore\Domain\Interfaces\Repository\RelationConfigInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnLib\Db\Helpers\QueryBuilder\DoctrineQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
 
-abstract class BaseDoctrineCrudRepository extends BaseDoctrineRepository implements CrudRepositoryInterface
+abstract class BaseDoctrineCrudRepository extends BaseDoctrineRepository implements CrudRepositoryInterface//, RelationConfigInterface
 {
 
     protected $primaryKey = ['id'];
 
-    public function relations()
+    /*public function _relations()
     {
         return [];
-    }
+    }*/
 
     public function primaryKey()
     {

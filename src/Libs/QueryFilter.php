@@ -4,6 +4,7 @@ namespace ZnLib\Db\Libs;
 
 use Illuminate\Support\Collection;
 use ZnBundle\Eav\Domain\Repositories\Eloquent\FieldRepository;
+use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Domain\Helpers\Repository\RelationHelper;
 use ZnCore\Domain\Helpers\Repository\RelationWithHelper;
@@ -24,13 +25,19 @@ class QueryFilter
     public function __construct(ReadAllInterface $repository, Query $query)
     {
         $this->repository = $repository;
+        if ($this->repository && $this->repository instanceof RelationConfigInterface) {
+            DeprecateHelper::softThrow('RelationConfigInterface is deprecated, use relations2 for definition!');
+        }
         $this->query = $query;
     }
 
     public function getQueryWithoutRelations(): Query
     {
         $query = clone $this->query;
-        $this->with = RelationWithHelper::cleanWith($this->repository->relations(), $query);
+        if(method_exists($this->repository, 'relations')) {
+            DeprecateHelper::softThrow('Method relations is deprecated, use relations2 for definition!');
+            $this->with = RelationWithHelper::cleanWith($this->repository->relations(), $query);
+        }
         return $query;
     }
 

@@ -35,10 +35,10 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     protected $primaryKey = ['id'];
 
-    public function relations()
+    /*public function _relations()
     {
         return [];
-    }
+    }*/
 
     public function primaryKey()
     {
