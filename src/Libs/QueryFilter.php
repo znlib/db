@@ -36,13 +36,16 @@ class QueryFilter
 
     public function loadRelations(Collection $collection)
     {
-        $with = $this->query->getParam(Query::WITH);
-
         if(method_exists($this->repository, 'relations2')) {
-            //prr($with);
             $relationLoader = new RelationLoader;
             $relationLoader->setRelations($this->repository->relations2());
             $relationLoader->setRepository($this->repository);
+
+            /*$with = $this->query->getParam(Query::WITH);
+            if($with) {
+                dd($with);
+            }*/
+
             $relationLoader->loadRelations($collection, $this->query);
             return $collection;
         }
