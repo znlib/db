@@ -106,9 +106,6 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     public function loadRelations(Collection $collection, array $with) {
         $query = $this->forgeQuery();
         $query->with($with);
-        /*if($with) {
-            dd($with);
-        }*/
         $queryFilter = $this->queryFilterInstance($query);
         $queryFilter->loadRelations($collection);
     }

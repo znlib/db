@@ -47,12 +47,6 @@ class QueryFilter
             $relationLoader = new RelationLoader;
             $relationLoader->setRelations($this->repository->relations2());
             $relationLoader->setRepository($this->repository);
-
-            /*$with = $this->query->getParam(Query::WITH);
-            if($with) {
-                dd($with);
-            }*/
-
             $relationLoader->loadRelations($collection, $this->query);
             return $collection;
         }
@@ -64,20 +58,6 @@ class QueryFilter
             prr($with);
         }*/
         $collection = RelationHelper::load($this->repository, $this->query, $collection);
-        
-        //dd($collection);
         return $collection;
     }
-
-    /*public function getQuery() : Query {
-        if(!isset($this->query)) {
-            $this->query = Query::forge();
-        }
-        return $this->query;
-    }
-    
-    public function setQuery(Query $query) {
-        $this->query = clone $query;
-    }*/
-
 }
