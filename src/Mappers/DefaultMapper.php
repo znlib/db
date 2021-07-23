@@ -16,13 +16,13 @@ class DefaultMapper implements MapperInterface
         $this->entityClass = $entityClass;
     }
 
-    public function encode(object $entity): array
+    public function encode($entity): array
     {
         $data = EntityHelper::toArrayForTablize($entity);
         return $data;
     }
 
-    public function decode(array $row): object
+    public function decode(array $row)
     {
         $entity = ClassHelper::createInstance($this->entityClass);
         EntityHelper::setAttributes($entity, $row);
