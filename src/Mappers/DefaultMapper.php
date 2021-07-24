@@ -6,6 +6,11 @@ use ZnCore\Base\Helpers\ClassHelper;
 use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Helpers\EntityHelper;
 
+/**
+ * Class DefaultMapper
+ * @package ZnLib\Db\Mappers
+ * @deprecated 
+ */
 class DefaultMapper implements MapperInterface
 {
 
