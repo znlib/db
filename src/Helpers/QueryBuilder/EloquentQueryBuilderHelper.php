@@ -64,6 +64,17 @@ class EloquentQueryBuilderHelper implements QueryBuilderInterface
         }
     }
 
+    public static function setGroupBy(Query $query, Builder $queryBuilder)
+    {
+        $queryArr = $query->toArray();
+        if ( ! empty($queryArr[Query::GROUP])) {
+            $queryBuilder->groupBy($queryArr[Query::GROUP]);
+            /*foreach ($queryArr[Query::GROUP] as $field => $direction) {
+                $queryBuilder->groupBy($field, DbHelper::encodeDirection($direction));
+            }*/
+        }
+    }
+
     public static function setSelect(Query $query, Builder $queryBuilder)
     {
         $queryArr = $query->toArray();

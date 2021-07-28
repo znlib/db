@@ -88,6 +88,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
         EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setGroupBy($query, $queryBuilder);
         EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
         $collection = $this->allByBuilder($queryBuilder);
         return $collection;
@@ -228,6 +229,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
         EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setGroupBy($query, $queryBuilder);
         EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
         $queryBuilder->update($values);
 //        $collection = $this->allByBuilder($queryBuilder);
