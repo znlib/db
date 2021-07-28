@@ -4,6 +4,7 @@ namespace ZnLib\Db\Base;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use ZnCore\Base\Exceptions\AlreadyExistsException;
 use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
@@ -20,6 +21,7 @@ use ZnCore\Domain\Helpers\FilterModelHelper;
 use ZnCore\Domain\Helpers\QueryHelper;
 use ZnCore\Domain\Helpers\ValidationHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
+use ZnCore\Domain\Interfaces\Entity\UniqueInterface;
 use ZnCore\Domain\Interfaces\ForgeQueryByFilterInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Libs\Query;
@@ -131,6 +133,10 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     public function create(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
+        /*$existedEntity = $this->oneByUnique($entity);
+        if($existedEntity) {
+            throw new AlreadyExistsException(get_class($entity) . ' already exist!');
+        }*/
         $arraySnakeCase = $this->mapperEncodeEntity($entity);
         $queryBuilder = $this->getQueryBuilder();
         try {
@@ -149,6 +155,25 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $errors->add('', $message);
             throw $errors;
         }
+    }
+
+    public function oneByUnique(UniqueInterface $entity): EntityIdInterface
+    {
+//        $entityClass = get_class($entity);
+        $unique = $entity->unique();
+        foreach ($unique as $uniqueConfig) {
+            $query = new Query();
+            foreach ($uniqueConfig as $uniqueName) {
+                $query->where(Inflector::underscore($uniqueName), EntityHelper::getValue($entity, $uniqueName));
+            }
+            $all = $this->all($query);
+            if ($all->count() > 0) {
+                return $all->first();
+                //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
+                //return;
+            }
+        }
+        throw new NotFoundException();
     }
 
     public function createCollection(Collection $collection)
