@@ -156,9 +156,9 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         }
     }
 
-    public function oneByUnique(UniqueInterface $entity): ?EntityIdInterface
+    public function oneByUnique(UniqueInterface $entity): EntityIdInterface
     {
-        $entityClass = get_class($entity);
+//        $entityClass = get_class($entity);
         $unique = $entity->unique();
         foreach ($unique as $uniqueConfig) {
             $query = new Query();
