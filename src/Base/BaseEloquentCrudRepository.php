@@ -172,7 +172,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
                 //return;
             }
         }
-        return null;
+        throw new NotFoundException();
     }
 
     public function createCollection(Collection $collection)
