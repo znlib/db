@@ -8,6 +8,7 @@ use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
 use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Enums\EventEnum;
@@ -70,12 +71,21 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $queryFilter;
     }
 
+    protected function forgeQueryBuilder(QueryBuilder $queryBuilder, Query $query)
+    {
+//        $queryBuilder = $queryBuilder ?? $this->getQueryBuilder();
+        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
+//        return
+    }
+
     public function count(Query $query = null): int
     {
         $query = $this->forgeQuery($query);
         $queryBuilder = $this->getQueryBuilder();
-        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
+        $this->forgeQueryBuilder($queryBuilder, $query);
+//        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+//        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         return $queryBuilder->count();
     }
 
@@ -83,11 +93,13 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
         $query = $this->forgeQuery($query);
         $queryBuilder = $this->getQueryBuilder();
+        $this->forgeQueryBuilder($queryBuilder, $query);
         $query->select([$queryBuilder->from . '.*']);
-        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
+//        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
+//        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
         EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setGroupBy($query, $queryBuilder);
         EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
         $collection = $this->allByBuilder($queryBuilder);
         return $collection;
@@ -184,6 +196,12 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     }*/
 
+    protected function allBySql(string $sql, array $binds = []) {
+        return $this->getConnection()
+            ->createCommand($sql, $binds)
+            ->queryAll(\PDO::FETCH_CLASS);
+    }
+
     public function update(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
@@ -228,6 +246,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
         EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
+        EloquentQueryBuilderHelper::setGroupBy($query, $queryBuilder);
         EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
         $queryBuilder->update($values);
 //        $collection = $this->allByBuilder($queryBuilder);
