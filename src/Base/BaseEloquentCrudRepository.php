@@ -11,6 +11,7 @@ use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
+use ZnCore\Base\Libs\I18Next\Facades\I18Next;
 use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
@@ -146,10 +147,11 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     public function create(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
-        /*$existedEntity = $this->oneByUnique($entity);
+        $existedEntity = $this->oneByUnique($entity);
         if($existedEntity) {
-            throw new AlreadyExistsException(get_class($entity) . ' already exist!');
-        }*/
+            $message = I18Next::t('core', 'domain.message.entity_already_exist');
+            throw new AlreadyExistsException($message);
+        }
         $arraySnakeCase = $this->mapperEncodeEntity($entity);
         $queryBuilder = $this->getQueryBuilder();
         try {
