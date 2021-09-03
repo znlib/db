@@ -2,6 +2,7 @@
 
 namespace ZnLib\Db\Base;
 
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\AlreadyExistsException;
@@ -9,18 +10,14 @@ use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
 use ZnCore\Base\Libs\I18Next\Facades\I18Next;
-use ZnCore\Contract\Mapper\Interfaces\MapperInterface;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
-use ZnCore\Domain\Events\EntityEvent;
 use ZnCore\Domain\Events\QueryEvent;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnCore\Domain\Helpers\FilterModelHelper;
-use ZnCore\Domain\Helpers\QueryHelper;
 use ZnCore\Domain\Helpers\ValidationHelper;
 use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
 use ZnCore\Domain\Interfaces\Entity\UniqueInterface;
@@ -29,7 +26,6 @@ use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
-use ZnLib\Db\Traits\MapperTrait;
 
 abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface
 {
@@ -120,7 +116,8 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $collection;
     }
 
-    public function loadRelations(Collection $collection, array $with) {
+    public function loadRelations(Collection $collection, array $with)
+    {
         $query = $this->forgeQuery();
         $query->with($with);
         $queryFilter = $this->queryFilterInstance($query);
@@ -144,14 +141,23 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $collection->first();
     }
 
+    public function checkExists(EntityIdInterface $entity)
+    {
+        try {
+            $existedEntity = $this->oneByUnique($entity);
+            if ($existedEntity) {
+                $message = I18Next::t('core', 'domain.message.entity_already_exist');
+                $e = new AlreadyExistsException($message);
+                $e->setEntity($entity);
+                throw $e;
+            }
+        } catch (NotFoundException $e) {}
+    }
+
     public function create(EntityIdInterface $entity)
     {
         ValidationHelper::validateEntity($entity);
-        $existedEntity = $this->oneByUnique($entity);
-        if($existedEntity) {
-            $message = I18Next::t('core', 'domain.message.entity_already_exist');
-            throw new AlreadyExistsException($message);
-        }
+
         $arraySnakeCase = $this->mapperEncodeEntity($entity);
         $queryBuilder = $this->getQueryBuilder();
         try {
@@ -159,7 +165,9 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $entity->setId($lastId);
         } catch (QueryException $e) {
             $errors = new UnprocessibleEntityException;
-            if($_ENV['APP_DEBUG']) {
+
+            $this->checkExists($entity);
+            if ($_ENV['APP_DEBUG']) {
                 $message = $e->getMessage();
                 $message = preg_replace('/(\s+)/i', ' ', $message);
                 $message = str_replace("'", "\\'", $message);
@@ -168,6 +176,25 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
                 $message = 'Database error!';
             }
             $errors->add('', $message);
+
+
+            /*try {
+
+            } catch (AlreadyExistsException $e) {
+                if ($entity instanceof UniqueInterface) {
+                    $unique = $entity->unique();
+                    if ($unique) {
+                        foreach ($unique as $attributeNames) {
+                            foreach ($attributeNames as $attributeName) {
+                                $errors->add($attributeName, $e->getMessage());
+                            }
+                        }
+                    }
+                }
+                if ($errors->getErrorCollection()->isEmpty()) {
+                    $errors->add('', $e->getMessage());
+                }
+            }*/
             throw $errors;
         }
     }
@@ -225,7 +252,8 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     }*/
 
-    protected function allBySql(string $sql, array $binds = []) {
+    protected function allBySql(string $sql, array $binds = [])
+    {
         return $this->getConnection()
             ->createCommand($sql, $binds)
             ->queryAll(\PDO::FETCH_CLASS);
