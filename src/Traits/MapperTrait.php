@@ -79,6 +79,7 @@ trait MapperTrait
 
         $mappers = $this->mappers();
         if($mappers) {
+            $mappers = array_reverse($mappers);
             $encoders = new AggregateEncoder(new Collection($mappers));
             $array = $encoders->decode($array);
         }
