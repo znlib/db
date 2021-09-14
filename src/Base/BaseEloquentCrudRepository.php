@@ -148,7 +148,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             if ($existedEntity) {
                 $message = I18Next::t('core', 'domain.message.entity_already_exist');
                 $e = new AlreadyExistsException($message);
-                $e->setEntity($entity);
+                $e->setEntity($existedEntity);
                 throw $e;
             }
         } catch (NotFoundException $e) {}
