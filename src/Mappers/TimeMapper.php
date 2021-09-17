@@ -3,6 +3,7 @@
 namespace ZnLib\Db\Mappers;
 
 use ZnCore\Base\Interfaces\EncoderInterface;
+use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 
 class TimeMapper implements EncoderInterface
 {
@@ -28,6 +29,7 @@ class TimeMapper implements EncoderInterface
     public function decode($row)
     {
         foreach ($this->attributes as $attribute) {
+            $attribute = Inflector::underscore($attribute);
             $row[$attribute] = new \DateTime($row[$attribute]);
         }
         return $row;
