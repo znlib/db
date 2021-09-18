@@ -30,7 +30,10 @@ class TimeMapper implements EncoderInterface
     {
         foreach ($this->attributes as $attribute) {
             $attribute = Inflector::underscore($attribute);
-            $row[$attribute] = new \DateTime($row[$attribute]);
+            $value = $row[$attribute];
+            if($value) {
+                $row[$attribute] = new \DateTime($value);
+            }
         }
         return $row;
     }
