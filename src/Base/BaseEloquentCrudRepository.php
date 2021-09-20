@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\AlreadyExistsException;
+use ZnCore\Base\Exceptions\InvalidMethodParameterException;
 use ZnCore\Base\Exceptions\NotFoundException;
 use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
@@ -126,6 +127,10 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function oneById($id, Query $query = null): EntityIdInterface
     {
+        if(empty($id)) {
+            throw (new InvalidMethodParameterException('Empty ID'))
+                ->setParameterName('id');
+        }
         $query = $this->forgeQuery($query);
         $query->where($this->primaryKey[0], $id);
         return $this->one($query);

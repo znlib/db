@@ -5,6 +5,7 @@ namespace ZnLib\Db\Base;
 use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\QueryException;
+use ZnCore\Base\Exceptions\InvalidMethodParameterException;
 use ZnCore\Domain\Enums\OperatorEnum;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
@@ -78,6 +79,10 @@ abstract class BaseDoctrineCrudRepository extends BaseDoctrineRepository impleme
 
     public function oneById($id, Query $query = null): EntityIdInterface
     {
+        if(empty($id)) {
+            throw (new InvalidMethodParameterException('Empty ID'))
+                ->setParameterName('id');
+        }
         $query = $this->forgeQuery($query);
         $query->where('id', $id);
         return $this->one($query);
