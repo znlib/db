@@ -225,7 +225,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function createCollection(Collection $collection)
     {
-        DeprecateHelper::softThrow();
+//        DeprecateHelper::softThrow();
         $array = [];
         foreach ($collection as $entity) {
             ValidationHelper::validateEntity($entity);
