@@ -208,16 +208,18 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
 //        $entityClass = get_class($entity);
         $unique = $entity->unique();
-        foreach ($unique as $uniqueConfig) {
-            $query = new Query();
-            foreach ($uniqueConfig as $uniqueName) {
-                $query->where(Inflector::underscore($uniqueName), EntityHelper::getValue($entity, $uniqueName));
-            }
-            $all = $this->all($query);
-            if ($all->count() > 0) {
-                return $all->first();
-                //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
-                //return;
+        if(!empty($unique)) {
+            foreach ($unique as $uniqueConfig) {
+                $query = new Query();
+                foreach ($uniqueConfig as $uniqueName) {
+                    $query->where(Inflector::underscore($uniqueName), EntityHelper::getValue($entity, $uniqueName));
+                }
+                $all = $this->all($query);
+                if ($all->count() > 0) {
+                    return $all->first();
+                    //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
+                    //return;
+                }
             }
         }
         throw new NotFoundException();
