@@ -12,15 +12,24 @@ use ZnCore\Domain\Entities\Query\Where;
 class EloquentQueryBuilderHelper implements QueryBuilderInterface
 {
 
+    public static function forgeColumnName(string $columnName, Builder $queryBuilder): string
+    {
+        if(strpos($columnName, '.')  === false) {
+            $columnName = $queryBuilder->from . '.' . $columnName;
+        }
+        return $columnName;
+    }
+
     public static function setWhere(Query $query, Builder $queryBuilder)
     {
         $queryArr = $query->toArray();
         if ( ! empty($queryArr[Query::WHERE])) {
             foreach ($queryArr[Query::WHERE] as $key => $value) {
+                $column = self::forgeColumnName($key, $queryBuilder);
                 if (is_array($value)) {
-                    $queryBuilder->whereIn($key, $value);
+                    $queryBuilder->whereIn($column, $value);
                 } else {
-                    $queryBuilder->where($key, $value);
+                    $queryBuilder->where($column, $value);
                 }
             }
         }
@@ -29,10 +38,11 @@ class EloquentQueryBuilderHelper implements QueryBuilderInterface
         if ( ! empty($whereArray)) {
             /** @var Where $where */
             foreach ($whereArray as $where) {
+                $column = self::forgeColumnName($where->column, $queryBuilder);
                 if (is_array($where->value)) {
-                    $queryBuilder->whereIn($where->column, $where->value, $where->boolean, $where->not);
+                    $queryBuilder->whereIn($column, $where->value, $where->boolean, $where->not);
                 } else {
-                    $queryBuilder->where($where->column, $where->operator, $where->value, $where->boolean);
+                    $queryBuilder->where($column, $where->operator, $where->value, $where->boolean);
                 }
             }
         }
