@@ -32,8 +32,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 {
 
     use EventDispatcherTrait;
-
-
+    
     protected $primaryKey = ['id'];
 
     /*public function _relations()
