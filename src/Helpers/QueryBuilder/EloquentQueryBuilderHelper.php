@@ -69,7 +69,8 @@ class EloquentQueryBuilderHelper implements QueryBuilderInterface
         $queryArr = $query->toArray();
         if ( ! empty($queryArr[Query::ORDER])) {
             foreach ($queryArr[Query::ORDER] as $field => $direction) {
-                $queryBuilder->orderBy($field, DbHelper::encodeDirection($direction));
+                $column = self::forgeColumnName($field, $queryBuilder);
+                $queryBuilder->orderBy($column, DbHelper::encodeDirection($direction));
             }
         }
     }
