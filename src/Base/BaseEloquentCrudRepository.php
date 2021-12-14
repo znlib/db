@@ -8,13 +8,13 @@ use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\AlreadyExistsException;
 use ZnCore\Base\Exceptions\InvalidMethodParameterException;
 use ZnCore\Base\Exceptions\NotFoundException;
-use ZnCore\Base\Helpers\DeprecateHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
 use ZnCore\Base\Libs\I18Next\Facades\I18Next;
 use ZnCore\Domain\Enums\EventEnum;
 use ZnCore\Domain\Enums\OperatorEnum;
+use ZnCore\Domain\Events\EntityEvent;
 use ZnCore\Domain\Events\QueryEvent;
 use ZnCore\Domain\Exceptions\UnprocessibleEntityException;
 use ZnCore\Domain\Helpers\EntityHelper;
@@ -32,7 +32,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 {
 
     use EventDispatcherTrait;
-    
+
     protected $primaryKey = ['id'];
 
     /*public function _relations()
@@ -48,6 +48,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     protected function forgeQuery(Query $query = null)
     {
         $query = Query::forge($query);
+        $this->dispatchQueryEvent($query, EventEnum::BEFORE_FORGE_QUERY);
         return $query;
     }
 
@@ -126,13 +127,14 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function oneById($id, Query $query = null): EntityIdInterface
     {
-        if(empty($id)) {
+        if (empty($id)) {
             throw (new InvalidMethodParameterException('Empty ID'))
                 ->setParameterName('id');
         }
         $query = $this->forgeQuery($query);
         $query->where($this->primaryKey[0], $id);
-        return $this->one($query);
+        $entity = $this->one($query);
+        return $entity;
     }
 
     public function one(Query $query = null)
@@ -142,7 +144,9 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         if ($collection->count() < 1) {
             throw new NotFoundException('Not found entity!');
         }
-        return $collection->first();
+        $entity = $collection->first();
+        $event = $this->dispatchEntityEvent($entity, EventEnum::AFTER_READ_ENTITY);
+        return $entity;
     }
 
     public function checkExists(EntityIdInterface $entity)
@@ -155,7 +159,8 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
                 $e->setEntity($existedEntity);
                 throw $e;
             }
-        } catch (NotFoundException $e) {}
+        } catch (NotFoundException $e) {
+        }
     }
 
     public function create(EntityIdInterface $entity)
@@ -165,8 +170,17 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         $arraySnakeCase = $this->mapperEncodeEntity($entity);
         $queryBuilder = $this->getQueryBuilder();
         try {
+
+            $event = $this->dispatchEntityEvent($entity, EventEnum::BEFORE_CREATE_ENTITY);
+            if ($event->isPropagationStopped()) {
+                return $entity;
+            }
+
             $lastId = $queryBuilder->insertGetId($arraySnakeCase);
             $entity->setId($lastId);
+
+            $event = $this->dispatchEntityEvent($entity, EventEnum::AFTER_CREATE_ENTITY);
+
         } catch (QueryException $e) {
             $errors = new UnprocessibleEntityException;
 
@@ -207,7 +221,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
 //        $entityClass = get_class($entity);
         $unique = $entity->unique();
-        if(!empty($unique)) {
+        if (!empty($unique)) {
             foreach ($unique as $uniqueConfig) {
                 $query = new Query();
                 foreach ($uniqueConfig as $uniqueName) {
@@ -269,8 +283,14 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     {
         ValidationHelper::validateEntity($entity);
         $this->oneById($entity->getId());
+
+        $event = $this->dispatchEntityEvent($entity, EventEnum::BEFORE_UPDATE_ENTITY);
+
         $data = $this->mapperEncodeEntity($entity);
         $this->updateQuery($entity->getId(), $data);
+
+        $event = $this->dispatchEntityEvent($entity, EventEnum::AFTER_UPDATE_ENTITY);
+
         //$this->updateById($entity->getId(), $data);
     }
 
@@ -291,9 +311,14 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     public function deleteById($id)
     {
-        $this->oneById($id);
+        $entity = $this->oneById($id);
+
+        $event = $this->dispatchEntityEvent($entity, EventEnum::BEFORE_DELETE_ENTITY);
+
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->delete($id);
+
+        $event = $this->dispatchEntityEvent($entity, EventEnum::AFTER_DELETE_ENTITY);
     }
 
     public function updateByQuery(Query $query, array $values)
@@ -323,5 +348,19 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $queryBuilder->where($key, OperatorEnum::EQUAL, $value);
         }
         $queryBuilder->delete();
+    }
+
+    protected function dispatchQueryEvent(Query $query, string $eventName): QueryEvent
+    {
+        $event = new QueryEvent($query);
+        $this->getEventDispatcher()->dispatch($event, $eventName);
+        return $event;
+    }
+
+    protected function dispatchEntityEvent(object $entity, string $eventName): EntityEvent
+    {
+        $event = new EntityEvent($entity);
+        $this->getEventDispatcher()->dispatch($event, $eventName);
+        return $event;
     }
 }
