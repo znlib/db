@@ -24,11 +24,12 @@ use ZnCore\Domain\Interfaces\Entity\EntityIdInterface;
 use ZnCore\Domain\Interfaces\Entity\UniqueInterface;
 use ZnCore\Domain\Interfaces\ForgeQueryByFilterInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
+use ZnCore\Domain\Interfaces\Repository\ReadOneUniqueInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
 use ZnLib\Db\Libs\QueryFilter;
 
-abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface
+abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface, ReadOneUniqueInterface
 {
 
     use EventDispatcherTrait;
