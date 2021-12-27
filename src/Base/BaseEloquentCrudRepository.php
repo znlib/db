@@ -46,6 +46,10 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $this->primaryKey;
     }
 
+    /**
+     * @param Query|null $query
+     * @return Query
+     */
     protected function forgeQuery(Query $query = null)
     {
         $query = Query::forge($query);
