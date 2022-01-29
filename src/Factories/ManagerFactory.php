@@ -17,6 +17,11 @@ class ManagerFactory
     public static function createManagerFromEnv(): Manager
     {
         $connections = DbFacade::getConfigFromEnv();
+        return self::createManagerFromConnections($connections);
+    }
+
+    public static function createManagerFromConnections(array $connections): Manager
+    {
         $config = LoadHelper::loadConfig($_ENV['ELOQUENT_CONFIG_FILE']);
         $connectionMap = ArrayHelper::getValue($config, 'connection.connectionMap', []);
 
