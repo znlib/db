@@ -320,9 +320,11 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
         $event = $this->dispatchEntityEvent($entity, EventEnum::BEFORE_DELETE_ENTITY);
 
-        $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->delete($id);
-
+        if (!$event->isSkipHandle()) {
+            $queryBuilder = $this->getQueryBuilder();
+            $queryBuilder->delete($id);
+        }
+        
         $event = $this->dispatchEntityEvent($entity, EventEnum::AFTER_DELETE_ENTITY);
     }
 
