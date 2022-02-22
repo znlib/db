@@ -252,7 +252,8 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $columnList = $this->getColumnsForModify();
             $array[] = EntityHelper::toArrayForTablize($entity, $columnList);
         }
-        $this->getQueryBuilder()->insert($array);
+//        $this->getQueryBuilder()->insert($array);
+        $this->getQueryBuilder()->insertOrIgnore($array);
     }
 
     protected function getColumnsForModify()
