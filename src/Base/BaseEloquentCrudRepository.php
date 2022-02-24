@@ -230,13 +230,20 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             foreach ($unique as $uniqueConfig) {
                 $query = new Query();
                 foreach ($uniqueConfig as $uniqueName) {
-                    $query->where(Inflector::underscore($uniqueName), EntityHelper::getValue($entity, $uniqueName));
+                    $value = EntityHelper::getValue($entity, $uniqueName);
+                    if($value === null) {
+                        $query = null;
+                        break;
+                    }
+                    $query->where(Inflector::underscore($uniqueName), $value);
                 }
-                $all = $this->all($query);
-                if ($all->count() > 0) {
-                    return $all->first();
-                    //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
-                    //return;
+                if($query) {
+                    $all = $this->all($query);
+                    if ($all->count() > 0) {
+                        return $all->first();
+                        //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
+                        //return;
+                    }
                 }
             }
         }
