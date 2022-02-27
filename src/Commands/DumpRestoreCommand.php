@@ -8,15 +8,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
+use ZnCore\Domain\Helpers\EntityHelper;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
 use ZnLib\Fixture\Domain\Repositories\DbRepository;
 use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
 use ZnSandbox\Sandbox\Office\Domain\Libs\Zip;
 
-class DumpCreateCommand extends Command
+class DumpRestoreCommand extends Command
 {
-    protected static $defaultName = 'db:database:dump-create';
+    protected static $defaultName = 'db:database:dump-restore';
     private $capsule;
     private $schemaRepository;
     private $dbRepository;
@@ -46,16 +47,16 @@ class DumpCreateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln(['<fg=white># Dump Create</>']);
+        $output->writeln(['<fg=white># Dump restore</>']);
 
         $connections = DbFacade::getConfigFromEnv();
         foreach ($connections as $connectionName => $connection) {
-            $conn = $this->capsule->getConnection($connectionName);
+//            $conn = $this->capsule->getConnection($connectionName);
             $tableList = $this->schemaRepository->allTables();
-            /*$tableList = $conn->select('
-                SELECT *
-                FROM pg_catalog.pg_tables
-                WHERE schemaname != \'pg_catalog\' AND schemaname != \'information_schema\';');*/
+            $tableList = $this->schemaRepository->allTablesByName(EntityHelper::getColumn($tableList, 'name'));
+
+            dd($tableList);
+
             $tables = [];
             $schemas = [];
             foreach ($tableList as $tableEntity) {
@@ -69,25 +70,23 @@ class DumpCreateCommand extends Command
                 }
             }
 
-            //$dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
             FileHelper::createDirectory($this->dumpPath);
 
             if (empty($tables)) {
                 $output->writeln(['', '<fg=yellow>Not found tables!</>', '']);
             } else {
-//                foreach ($tables as $t) {
                 foreach ($tableList as $tableEntity) {
                     $tableName = $tableEntity->getSchemaName() . '.' . $tableEntity->getName();
                     $output->write($tableName . ' ... ');
-                    $this->dump($tableName);
+                    //$this->dump($tableName);
                     $output->writeln('<fg=green>OK</>');
                 }
             }
         }
 
-        $output->writeln(['', '<fg=green>Path: ' . $this->dumpPath . '</>', '']);
+//        $output->writeln(['', '<fg=green>Path: ' . $dumpPath . '</>', '']);
 
-        $output->writeln(['', '<fg=green>Dump Create success!</>', '']);
+        $output->writeln(['', '<fg=green>Dump restore success!</>', '']);
         return 0;
     }
 
