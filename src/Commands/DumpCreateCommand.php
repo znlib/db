@@ -20,14 +20,14 @@ class DumpCreateCommand extends Command
     private $capsule;
     private $schemaRepository;
     private $dbRepository;
-    private $dumpPath;
+    private $currentDumpPath;
 
     public function __construct(?string $name = null, SchemaRepository $schemaRepository, DbRepository $dbRepository)
     {
         $this->capsule = ManagerFactory::createManagerFromEnv();
         $this->schemaRepository = $schemaRepository;
         $this->dbRepository = $dbRepository;
-        $this->dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
+        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
         parent::__construct($name);
     }
 
@@ -69,8 +69,8 @@ class DumpCreateCommand extends Command
                 }
             }
 
-            //$dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
-            FileHelper::createDirectory($this->dumpPath);
+            //$currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
+            FileHelper::createDirectory($this->currentDumpPath);
 
             if (empty($tables)) {
                 $output->writeln(['', '<fg=yellow>Not found tables!</>', '']);
@@ -85,14 +85,14 @@ class DumpCreateCommand extends Command
             }
         }
 
-        $output->writeln(['', '<fg=green>Path: ' . $this->dumpPath . '</>', '']);
+        $output->writeln(['', '<fg=green>Path: ' . $this->currentDumpPath . '</>', '']);
 
         $output->writeln(['', '<fg=green>Dump Create success!</>', '']);
         return 0;
     }
 
     private function dump(string $tableName) {
-        $tablePath = $this->dumpPath . '/' . $tableName;
+        $tablePath = $this->currentDumpPath . '/' . $tableName;
 
         $zip = new Zip($tablePath . '.zip');
 
