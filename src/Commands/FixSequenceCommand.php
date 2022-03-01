@@ -64,13 +64,15 @@ class FixSequenceCommand extends Command
             if (empty($tables)) {
                 $output->writeln(['', '<fg=yellow>Not found tables!</>', '']);
             } else {
-                foreach ($tables as $t) {
-                    $tt = explode('.', $t);
-                    if (count($tt) == 2) {
-                        list($schema, $tableName) = $tt;
-                    } else {
-                        dd($t);
-                    }
+                foreach ($tableList as $tableEntity) {
+                    /*foreach ($tables as $t) {
+                      /*$tt = explode('.', $t);
+                        if (count($tt) == 2) {
+                            list($schema, $tableName) = $tt;
+                        } else {
+                            dd($t);
+                        }*/
+                    $tableName = $tableEntity->getName();
 
                     try {
                         $sql = 'SELECT last_value FROM ' . $tableName . '_id_seq;';
@@ -91,14 +93,14 @@ class FixSequenceCommand extends Command
                         if (empty($max)) {
                             $output->writeln("<fg=yellow>EMPTY TABLE (seq-{$last_value})</>");
                         } else {
-                            if ($last_value == $max) {
+                            if ($last_value >= $max) {
                                 $output->writeln("<fg=green>OK ($last_value)</>");
                             } else {
                                 $output->writeln("<fg=red>FAIL (seq-{$last_value} maxId-{$max})</>");
                             }
                         }
                     } catch (\Throwable $e) {
-
+                        //throw new \Exception($e->getMessage());
                     }
                 }
             }
