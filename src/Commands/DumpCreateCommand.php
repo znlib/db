@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
+use ZnLib\Db\Entities\TableEntity;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
 use ZnLib\Fixture\Domain\Repositories\DbRepository;
@@ -27,7 +28,7 @@ class DumpCreateCommand extends Command
         $this->capsule = ManagerFactory::createManagerFromEnv();
         $this->schemaRepository = $schemaRepository;
         $this->dbRepository = $dbRepository;
-        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
+
         parent::__construct($name);
     }
 
@@ -47,6 +48,8 @@ class DumpCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(['<fg=white># Dump Create</>']);
+
+        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
 
         $connections = DbFacade::getConfigFromEnv();
         foreach ($connections as $connectionName => $connection) {
@@ -75,13 +78,18 @@ class DumpCreateCommand extends Command
             if (empty($tables)) {
                 $output->writeln(['', '<fg=yellow>Not found tables!</>', '']);
             } else {
+
+                // todo: блокировка БД от записи
+
 //                foreach ($tables as $t) {
                 foreach ($tableList as $tableEntity) {
                     $tableName = $tableEntity->getSchemaName() . '.' . $tableEntity->getName();
                     $output->write($tableName . ' ... ');
-                    $this->dump($tableName);
+                    $this->dump($tableName, $tableEntity);
                     $output->writeln('<fg=green>OK</>');
                 }
+
+                // todo: разблокировка БД от записи
             }
         }
 
@@ -91,14 +99,15 @@ class DumpCreateCommand extends Command
         return 0;
     }
 
-    private function dump(string $tableName) {
+    private function dump(string $tableName, TableEntity $tableEntity) {
         $tablePath = $this->currentDumpPath . '/' . $tableName;
-
         $zip = new Zip($tablePath . '.zip');
 
-        $queryBuilder = $this->dbRepository->getQueryBuilderByTableName($tableName);
         $page = 1;
         $perPage = 500;
+        $queryBuilder = $this->dbRepository->getQueryBuilderByTableName($tableName);
+
+        // todo: если есть ID или уникальные поля, сортировать по ним
 
         do {
             $queryBuilder->forPage($page, $perPage);

@@ -30,8 +30,6 @@ class DumpRestoreCommand extends Command
         $this->capsule = ManagerFactory::createManagerFromEnv();
         $this->schemaRepository = $schemaRepository;
         $this->dbRepository = $dbRepository;
-        $this->dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'];
-        $this->currentDumpPath = $this->dumpPath . '/' . date('Y-m/d/H-i-s');
         parent::__construct($name);
     }
 
@@ -98,6 +96,9 @@ class DumpRestoreCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(['<fg=white># Dump restore</>']);
+
+        $this->dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'];
+        $this->currentDumpPath = $this->dumpPath . '/' . date('Y-m/d/H-i-s');
 
         $versions = $this->getHistory();
 
