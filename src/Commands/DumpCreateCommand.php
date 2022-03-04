@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
 use ZnLib\Db\Entities\TableEntity;
@@ -49,7 +50,12 @@ class DumpCreateCommand extends Command
     {
         $output->writeln(['<fg=white># Dump Create</>']);
 
-        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s');
+        $question = new Question('Comment: ', '');
+        $comment = $this->getHelper('question')->ask($input, $output, $question);
+
+//dd($comment);
+
+        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s') . '-' . $comment;
 
         $connections = DbFacade::getConfigFromEnv();
         foreach ($connections as $connectionName => $connection) {
@@ -83,9 +89,9 @@ class DumpCreateCommand extends Command
 
 //                foreach ($tables as $t) {
                 foreach ($tableList as $tableEntity) {
-                    $tableName = $tableEntity->getSchemaName() . '.' . $tableEntity->getName();
+                    $tableName = /*$tableEntity->getSchemaName() . '.' . */$tableEntity->getName();
                     $output->write($tableName . ' ... ');
-                    $this->dump($tableName, $tableEntity);
+                    $this->dump($tableName/*, $tableEntity*/);
                     $output->writeln('<fg=green>OK</>');
                 }
 
@@ -99,7 +105,7 @@ class DumpCreateCommand extends Command
         return 0;
     }
 
-    private function dump(string $tableName, TableEntity $tableEntity) {
+    private function dump(string $tableName/*, TableEntity $tableEntity*/) {
         $tablePath = $this->currentDumpPath . '/' . $tableName;
         $zip = new Zip($tablePath . '.zip');
 

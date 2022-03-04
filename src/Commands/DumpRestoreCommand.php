@@ -6,13 +6,16 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
+use ZnCore\Base\Libs\App\Helpers\ContainerHelper;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnLib\Console\Symfony4\Question\ChoiceQuestion;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
+use ZnLib\Db\Libs\Dependency;
 use ZnLib\Fixture\Domain\Repositories\DbRepository;
 use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
 use ZnSandbox\Sandbox\Office\Domain\Libs\Zip;
@@ -89,18 +92,8 @@ class DumpRestoreCommand extends Command
         return $zipPath;
     }
 
-    public function getQueryBuilderByTableName($name): \Illuminate\Database\Query\Builder
-    {
-        $tableAlias = $this->getCapsule()->getAlias();
-        $targetTableName = $tableAlias->encode('default', $name);
-        $connection = $this->getCapsule()->getConnectionByTableName($name);
-        $queryBuilder = $connection->table($targetTableName);
-        return $queryBuilder;
-    }
-
     private function one(string $version, string $table): int
     {
-        $this->dbRepository->truncateData($table);
         $zipPath = $this->getZipPath($version, $table);
         $zip = new Zip($zipPath);
         $result = 0;
@@ -108,12 +101,8 @@ class DumpRestoreCommand extends Command
         foreach ($zip->files() as $file) {
             $jsonData = $zip->readFile($file);
             $data = json_decode($jsonData, JSON_OBJECT_AS_ARRAY);
-            //dd($data);
             $queryBuilder->insert($data);
             $result = $result + count($data);
-            /*$conn = $this->capsule->getConnection();
-            dd($conn->select());*/
-            //$result = array_merge($result, $data);
         }
         return $result;
     }
@@ -138,68 +127,53 @@ class DumpRestoreCommand extends Command
 
 //        $tree = FileHelper::scanDirTree($this->dumpPath, $options);
 
+        $output->writeln(['', '<fg=white>## Prepare</>', '']);
+
+        $output->write('calulate table dependencies ... ');
+
         $tables = $this->getTables($selectedVesrion);
-
-        $tt = [];
-
-        $tableList = $this->schemaRepository->allTables();
-        $tableList = $this->schemaRepository->allTablesByName(EntityHelper::getColumn($tableList, 'name'));
-        foreach ($tableList as $tableEntity) {
-            $tableName = $tableEntity->getName();
-            if($tableEntity->getRelations()) {
-                $deps = [];
-                foreach ($tableEntity->getRelations() as $relationEntity) {
-                    $deps[] = $relationEntity->getForeignTableName();
-                }
-            }
-            $this->tt[$tableName] = [
-                'deps' => array_values(array_unique($deps)),
-            ];
-        }
-
-        $tableQueue = [];
-        foreach ($this->tt as $tableName => $tableInfo) {
-            $this->pp($tableName);
-        }
-
-//        dd($this->pp);
 
         $ignoreTables = [
             'eq_migration',
         ];
 
-        foreach ($this->pp as $tableName) {
-            if(!in_array($tableName, $ignoreTables)) {
-                $output->write($tableName . ' ... ');
-                $count = $this->one($selectedVesrion, 'public.' . $tableName);
-                $output->writeln('(' . $count . ') <fg=green>OK</>');
-            }
+        $tableList = $this->schemaRepository->allTables();
+        $tt = EntityHelper::getColumn($tableList, 'name');
+        foreach ($ignoreTables as $ignoreTable) {
+            ArrayHelper::removeByValue($ignoreTable, $tt);
+        }
+
+        $dependency = ContainerHelper::getContainer()->get(Dependency::class);
+        $tableQueue = $dependency->run($tt);
+
+        $output->writeln('<fg=green>OK</>');
+
+//        dd($tableQueue);
+
+        $output->write('Truncate tables ... ');
+        foreach ($tableQueue as $tableName) {
+            $this->dbRepository->truncateData($tableName);
+        }
+        $output->writeln('<fg=green>OK</>');
+
+        $output->writeln(['', '<fg=white>## Restore</>', '']);
+
+        $total = [];
+        foreach ($tableQueue as $tableName) {
+            $output->write($tableName . ' ... ');
+            $count = $this->one($selectedVesrion, /*'public.' . */$tableName);
+            $output->writeln('(' . $count . ') <fg=green>OK</>');
+            $total[$tableName] = $count;
         }
 
 //        dd($tables);
 
-        $output->writeln(['', '<fg=green>Dump restore success!</>', '']);
+        $output->writeln('');
+        $output->writeln('<fg=green>Dump restore success!</>');
+        $output->writeln('');
+        $output->writeln('<fg=white>Total tables: '.count($tables).'</>');
+        $output->writeln('<fg=white>Total rows: '.array_sum($total).'</>');
+
         return 0;
-    }
-
-    private $tt = [];
-    private $pp = [];
-    private $dd = [];
-
-    protected function pp($tableName) {
-        if(in_array($tableName, $this->dd)) {
-            return;
-        }
-        $this->dd[] = $tableName;
-//        dump($tableName);
-        $deps = ArrayHelper::getValue($this->tt, [$tableName, 'deps']);
-//        dd($deps);
-        if($deps) {
-            foreach ($deps as $dep) {
-//                $this->pp[] = $dep;
-                $this->pp($dep);
-            }
-        }
-        $this->pp[] = $tableName;
     }
 }
