@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZnCore\Base\Helpers\StringHelper;
+use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnLib\Console\Symfony4\Question\ChoiceQuestion;
@@ -46,6 +47,14 @@ class DumpRestoreCommand extends Command
             );
     }
 
+    /**
+     * @return \ZnLib\Db\Capsule\Manager
+     */
+    public function getCapsule(): \ZnLib\Db\Capsule\Manager
+    {
+        return $this->capsule;
+    }
+
     private function getHistory(): array
     {
         $options = [];
@@ -73,22 +82,38 @@ class DumpRestoreCommand extends Command
         return $tables;
     }
 
-    private function getZipPath(string $version, string $table): array
+    private function getZipPath(string $version, string $table): string
     {
         $versionPath = $this->dumpPath . '/' . $version;
         $zipPath = $versionPath . '/' . $table . '.zip';
         return $zipPath;
     }
 
-    private function one(string $version, string $table): array
+    public function getQueryBuilderByTableName($name): \Illuminate\Database\Query\Builder
     {
+        $tableAlias = $this->getCapsule()->getAlias();
+        $targetTableName = $tableAlias->encode('default', $name);
+        $connection = $this->getCapsule()->getConnectionByTableName($name);
+        $queryBuilder = $connection->table($targetTableName);
+        return $queryBuilder;
+    }
+
+    private function one(string $version, string $table): int
+    {
+        $this->dbRepository->truncateData($table);
         $zipPath = $this->getZipPath($version, $table);
         $zip = new Zip($zipPath);
-        $result = [];
+        $result = 0;
+        $queryBuilder = $this->dbRepository->getQueryBuilderByTableName($table);
         foreach ($zip->files() as $file) {
             $jsonData = $zip->readFile($file);
-            $data = json_decode($jsonData);
-            $result = array_merge($result, $data);
+            $data = json_decode($jsonData, JSON_OBJECT_AS_ARRAY);
+            //dd($data);
+            $queryBuilder->insert($data);
+            $result = $result + count($data);
+            /*$conn = $this->capsule->getConnection();
+            dd($conn->select());*/
+            //$result = array_merge($result, $data);
         }
         return $result;
     }
@@ -115,14 +140,66 @@ class DumpRestoreCommand extends Command
 
         $tables = $this->getTables($selectedVesrion);
 
-        foreach ($tables as $tableName) {
-            $data = $this->one($selectedVesrion, $tableName);
-            dd($data);
+        $tt = [];
+
+        $tableList = $this->schemaRepository->allTables();
+        $tableList = $this->schemaRepository->allTablesByName(EntityHelper::getColumn($tableList, 'name'));
+        foreach ($tableList as $tableEntity) {
+            $tableName = $tableEntity->getName();
+            if($tableEntity->getRelations()) {
+                $deps = [];
+                foreach ($tableEntity->getRelations() as $relationEntity) {
+                    $deps[] = $relationEntity->getForeignTableName();
+                }
+            }
+            $this->tt[$tableName] = [
+                'deps' => array_values(array_unique($deps)),
+            ];
         }
 
-        dd($tables);
+        $tableQueue = [];
+        foreach ($this->tt as $tableName => $tableInfo) {
+            $this->pp($tableName);
+        }
+
+//        dd($this->pp);
+
+        $ignoreTables = [
+            'eq_migration',
+        ];
+
+        foreach ($this->pp as $tableName) {
+            if(!in_array($tableName, $ignoreTables)) {
+                $output->write($tableName . ' ... ');
+                $count = $this->one($selectedVesrion, 'public.' . $tableName);
+                $output->writeln('(' . $count . ') <fg=green>OK</>');
+            }
+        }
+
+//        dd($tables);
 
         $output->writeln(['', '<fg=green>Dump restore success!</>', '']);
         return 0;
+    }
+
+    private $tt = [];
+    private $pp = [];
+    private $dd = [];
+
+    protected function pp($tableName) {
+        if(in_array($tableName, $this->dd)) {
+            return;
+        }
+        $this->dd[] = $tableName;
+//        dump($tableName);
+        $deps = ArrayHelper::getValue($this->tt, [$tableName, 'deps']);
+//        dd($deps);
+        if($deps) {
+            foreach ($deps as $dep) {
+//                $this->pp[] = $dep;
+                $this->pp($dep);
+            }
+        }
+        $this->pp[] = $tableName;
     }
 }
