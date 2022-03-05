@@ -10,18 +10,19 @@ use ZnCore\Domain\Interfaces\GetEntityClassInterface;
 use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnCore\Domain\Traits\EntityManagerTrait;
 use ZnLib\Db\Capsule\Manager;
+use ZnLib\Db\Traits\EloquentTrait;
 use ZnLib\Db\Traits\MapperTrait;
 use ZnLib\Db\Traits\TableNameTrait;
 
 abstract class BaseEloquentRepository implements GetEntityClassInterface
 {
 
+    use EloquentTrait;
     use TableNameTrait;
     use EntityManagerTrait;
     use MapperTrait;
 
     protected $autoIncrement = 'id';
-    private $capsule;
     private $entityClassName;
 
     public function __construct(EntityManagerInterface $em, Manager $capsule)
@@ -35,16 +36,11 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $this->autoIncrement;
     }
 
-    public function getCapsule(): Manager
-    {
-        return $this->capsule;
-    }
-
-    public function getConnection(): Connection
+    /*public function getConnection(): Connection
     {
         $connection = $this->capsule->getConnection($this->connectionName());
         return $connection;
-    }
+    }*/
 
     protected function getQueryBuilder(): QueryBuilder
     {
@@ -53,12 +49,12 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
         return $queryBuilder;
     }
 
-    protected function getSchema(): SchemaBuilder
+    /*protected function getSchema(): SchemaBuilder
     {
         $connection = $this->getConnection();
         $schema = $connection->getSchemaBuilder();
         return $schema;
-    }
+    }*/
 
     /*function getAttributeMap(): array {
         return [
