@@ -64,14 +64,8 @@ class FixSequenceCommand extends Command
             if (empty($tables)) {
                 $output->writeln(['', '<fg=yellow>Not found tables!</>', '']);
             } else {
+                $isSuccess = true;
                 foreach ($tableList as $tableEntity) {
-                    /*foreach ($tables as $t) {
-                      /*$tt = explode('.', $t);
-                        if (count($tt) == 2) {
-                            list($schema, $tableName) = $tt;
-                        } else {
-                            dd($t);
-                        }*/
                     $tableName = $tableEntity->getName();
 
                     try {
@@ -91,21 +85,28 @@ class FixSequenceCommand extends Command
                         //}
                         $output->write("{$tableName} ... ");
                         if (empty($max)) {
-                            $output->writeln("<fg=yellow>EMPTY TABLE (seq-{$last_value})</>");
+                            $output->writeln("<fg=yellow>EMPTY</> ($last_value)");
                         } else {
                             if ($last_value >= $max) {
-                                $output->writeln("<fg=green>OK ($last_value)</>");
+                                $output->writeln("<fg=green>OK</> ($last_value)");
                             } else {
-                                $output->writeln("<fg=red>FAIL (seq-{$last_value} maxId-{$max})</>");
+                                $output->writeln("<fg=red>FAIL</> (seq-{$last_value} maxId-{$max})");
+                                $isSuccess = false;
                             }
                         }
                     } catch (\Throwable $e) {
                         //throw new \Exception($e->getMessage());
                     }
                 }
+
+                if($isSuccess) {
+                    $output->writeln(['', '<fg=green>Sequence success!</>', '']);
+                } else {
+                    $output->writeln(['', '<fg=red>Sequence FAIL!</>', '']);
+                }
             }
         }
-        $output->writeln(['', '<fg=green>Fix Sequence success!</>', '']);
+
         return 0;
     }
 }

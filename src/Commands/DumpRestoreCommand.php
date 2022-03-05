@@ -11,6 +11,7 @@ use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
 use ZnCore\Base\Libs\App\Helpers\ContainerHelper;
+use ZnCore\Base\Libs\DotEnv\DotEnv;
 use ZnCore\Domain\Helpers\EntityHelper;
 use ZnLib\Console\Symfony4\Question\ChoiceQuestion;
 use ZnLib\Db\Facades\DbFacade;
@@ -104,6 +105,7 @@ class DumpRestoreCommand extends Command
             $queryBuilder->insert($data);
             $result = $result + count($data);
         }
+        $this->dbRepository->resetAutoIncrement($table);
         return $result;
     }
 
@@ -111,7 +113,7 @@ class DumpRestoreCommand extends Command
     {
         $output->writeln(['<fg=white># Dump restore</>']);
 
-        $this->dumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'];
+        $this->dumpPath = DotEnv::get('ROOT_DIRECTORY') . '/' . DotEnv::get('DUMP_DIRECTORY');
         $this->currentDumpPath = $this->dumpPath . '/' . date('Y-m/d/H-i-s');
 
         $versions = $this->getHistory();

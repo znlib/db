@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
+use ZnCore\Base\Libs\DotEnv\DotEnv;
 use ZnLib\Db\Entities\TableEntity;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
@@ -54,8 +55,13 @@ class DumpCreateCommand extends Command
         $comment = $this->getHelper('question')->ask($input, $output, $question);
 
 //dd($comment);
+        
+        $dumpPath = DotEnv::get('ROOT_DIRECTORY') . '/' . DotEnv::get('DUMP_DIRECTORY') . '/' . date('Y-m/d/H-i-s');
+        if($comment) {
+            $dumpPath = $dumpPath . '-' . $comment;
+        }
 
-        $this->currentDumpPath = $_ENV['ROOT_DIRECTORY'] . '/' . $_ENV['DUMP_DIRECTORY'] . '/' . date('Y-m/d/H-i-s') . '-' . $comment;
+        $this->currentDumpPath = $dumpPath;
 
         $connections = DbFacade::getConfigFromEnv();
         foreach ($connections as $connectionName => $connection) {
