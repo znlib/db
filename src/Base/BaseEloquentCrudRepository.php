@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use ZnCore\Base\Exceptions\AlreadyExistsException;
 use ZnCore\Base\Exceptions\InvalidMethodParameterException;
 use ZnCore\Base\Exceptions\NotFoundException;
+use ZnCore\Base\Helpers\ClassHelper;
+use ZnCore\Base\Helpers\StringHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Legacy\Yii\Helpers\Inflector;
 use ZnCore\Base\Libs\Event\Traits\EventDispatcherTrait;
@@ -32,8 +34,6 @@ use ZnLib\Db\Libs\QueryFilter;
 abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface, ReadOneUniqueInterface
 {
 
-    use EventDispatcherTrait;
-
     protected $primaryKey = ['id'];
 
     /*public function _relations()
@@ -44,17 +44,6 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
     public function primaryKey()
     {
         return $this->primaryKey;
-    }
-
-    /**
-     * @param Query|null $query
-     * @return Query
-     */
-    protected function forgeQuery(Query $query = null)
-    {
-        $query = Query::forge($query);
-        $this->dispatchQueryEvent($query, EventEnum::BEFORE_FORGE_QUERY);
-        return $query;
     }
 
     public function forgeQueryByFilter(object $filterModel, Query $query)
@@ -78,14 +67,6 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         return $queryFilter;
     }
 
-    protected function forgeQueryBuilder(QueryBuilder $queryBuilder, Query $query)
-    {
-//        $queryBuilder = $queryBuilder ?? $this->getQueryBuilder();
-        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
-//        return
-    }
-
     public function count(Query $query = null): int
     {
         $query = $this->forgeQuery($query);
@@ -94,22 +75,6 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 //        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
 //        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
         return $queryBuilder->count();
-    }
-
-    public function _all(Query $query = null)
-    {
-        $query = $this->forgeQuery($query);
-        $queryBuilder = $this->getQueryBuilder();
-        $this->forgeQueryBuilder($queryBuilder, $query);
-        $query->select([$queryBuilder->from . '.*']);
-//        EloquentQueryBuilderHelper::setWhere($query, $queryBuilder);
-//        EloquentQueryBuilderHelper::setJoin($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setSelect($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setOrder($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setGroupBy($query, $queryBuilder);
-        EloquentQueryBuilderHelper::setPaginate($query, $queryBuilder);
-        $collection = $this->allByBuilder($queryBuilder);
-        return $collection;
     }
 
     public function all(Query $query = null)
@@ -192,7 +157,7 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $this->checkExists($entity);
             if ($_ENV['APP_DEBUG']) {
                 $message = $e->getMessage();
-                $message = preg_replace('/(\s+)/i', ' ', $message);
+                $message = StringHelper::removeDoubleSpace($message);
                 $message = str_replace("'", "\\'", $message);
                 $message = trim($message);
             } else {
@@ -222,28 +187,32 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
         }
     }
 
+    private function oneByUniqueGroup(UniqueInterface $entity, $uniqueConfig): ?EntityIdInterface
+    {
+        $isBreak = false;
+        $query = new Query();
+        foreach ($uniqueConfig as $uniqueName) {
+            $value = EntityHelper::getValue($entity, $uniqueName);
+            if($value === null) {
+                return null;
+            }
+            $query->where(Inflector::underscore($uniqueName), $value);
+        }
+        $all = $this->all($query);
+        if ($all->count() > 0) {
+            return $all->first();
+        }
+        return null;
+    }
+
     public function oneByUnique(UniqueInterface $entity): EntityIdInterface
     {
-//        $entityClass = get_class($entity);
         $unique = $entity->unique();
         if (!empty($unique)) {
             foreach ($unique as $uniqueConfig) {
-                $query = new Query();
-                foreach ($uniqueConfig as $uniqueName) {
-                    $value = EntityHelper::getValue($entity, $uniqueName);
-                    if($value === null) {
-                        $query = null;
-                        break;
-                    }
-                    $query->where(Inflector::underscore($uniqueName), $value);
-                }
-                if($query) {
-                    $all = $this->all($query);
-                    if ($all->count() > 0) {
-                        return $all->first();
-                        //EntityHelper::setAttributes($entity, EntityHelper::toArray($all->first()));
-                        //return;
-                    }
+                $oneEntity = $this->oneByUniqueGroup($entity, $uniqueConfig);
+                if($oneEntity) {
+                    return $oneEntity;
                 }
             }
         }
@@ -265,17 +234,21 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
 
     protected function getColumnsForModify()
     {
-        $schema = $this->getSchema();
-        $columnList = $schema->getColumnListing($this->tableNameAlias());
+        $columnList = $this->getSchema()->getColumnListing($this->tableNameAlias());
         if (empty($columnList)) {
             $columnList = EntityHelper::getAttributeNames($this->getEntityClass());
             foreach ($columnList as &$item) {
                 $item = Inflector::underscore($item);
             }
-
         }
-        if ($this->autoIncrement()) {
+        /*if(!empty($this->getEntityClass()) && ClassHelper::instanceOf($this->getEntityClass(), \ZnCore\Contract\Domain\Interfaces\Entities\EntityIdInterface::class, true)) {
+            ArrayHelper::removeByValue('id', $columnList);
+        }*/
+        /*if ($this->autoIncrement()) {
             ArrayHelper::removeByValue($this->autoIncrement(), $columnList);
+        }*/
+        if (in_array('id', $columnList)) {
+            ArrayHelper::removeByValue('id', $columnList);
         }
         return $columnList;
     }
@@ -363,19 +336,5 @@ abstract class BaseEloquentCrudRepository extends BaseEloquentRepository impleme
             $queryBuilder->where($key, OperatorEnum::EQUAL, $value);
         }
         $queryBuilder->delete();
-    }
-
-    protected function dispatchQueryEvent(Query $query, string $eventName): QueryEvent
-    {
-        $event = new QueryEvent($query);
-        $this->getEventDispatcher()->dispatch($event, $eventName);
-        return $event;
-    }
-
-    protected function dispatchEntityEvent(object $entity, string $eventName): EntityEvent
-    {
-        $event = new EntityEvent($entity);
-        $this->getEventDispatcher()->dispatch($event, $eventName);
-        return $event;
     }
 }

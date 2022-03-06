@@ -3,12 +3,15 @@
 namespace ZnLib\Db\Traits;
 
 use ZnCore\Base\Libs\DotEnv\DotEnv;
+use ZnLib\Db\Capsule\Manager;
 use ZnLib\Db\Libs\TableAlias;
 
 trait TableNameTrait
 {
 
     protected $tableName;
+
+    abstract public function getCapsule(): Manager;
 
     public function connectionName()
     {
