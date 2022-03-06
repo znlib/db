@@ -3,6 +3,7 @@
 namespace ZnLib\Db\Traits;
 
 use ZnCore\Base\Libs\DotEnv\DotEnv;
+use ZnLib\Db\Libs\TableAlias;
 
 trait TableNameTrait
 {
@@ -11,7 +12,9 @@ trait TableNameTrait
 
     public function connectionName()
     {
-        return $this->capsule->getConnectionNameByTableName($this->tableName());
+        return $this
+            ->getCapsule()
+            ->getConnectionNameByTableName($this->tableName());
     }
 
     public function tableName(): string
@@ -24,11 +27,20 @@ trait TableNameTrait
         return $this->encodeTableName($this->tableName());
     }
 
-    public function encodeTableName(string $sourceTableName): string
+    protected function getAlias(): TableAlias
     {
-        $tableAlias = $this->getCapsule()->getAlias();
-        $targetTableName = $tableAlias->encode($this->connectionName(), $sourceTableName);
+        return $this
+            ->getCapsule()
+            ->getAlias();
+    }
+    
+    public function encodeTableName(string $sourceTableName, string $connectionName = null): string
+    {
+        $connectionName = $connectionName ?: $this->connectionName();
+        $targetTableName = $this
+            ->getCapsule()
+            ->getAlias()
+            ->encode($connectionName, $sourceTableName);
         return $targetTableName;
     }
-
 }

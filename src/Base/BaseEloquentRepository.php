@@ -27,7 +27,7 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 
     public function __construct(EntityManagerInterface $em, Manager $capsule)
     {
-        $this->capsule = $capsule;
+        $this->setCapsule($capsule);
         $this->setEntityManager($em);
     }
 
@@ -44,9 +44,10 @@ abstract class BaseEloquentRepository implements GetEntityClassInterface
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        $connection = $this->getConnection();
-        $queryBuilder = $connection->table($this->tableNameAlias(), null);
-        return $queryBuilder;
+        return $this->getQueryBuilderByTableName($this->tableName());
+//        $connection = $this->getConnection();
+//        $queryBuilder = $connection->table($this->tableNameAlias(), null);
+//        return $queryBuilder;
     }
 
     /*protected function getSchema(): SchemaBuilder
