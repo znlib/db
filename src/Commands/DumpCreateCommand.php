@@ -14,7 +14,7 @@ use ZnLib\Db\Entities\TableEntity;
 use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
 use ZnLib\Fixture\Domain\Repositories\DbRepository;
-use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
+use ZnLib\Db\Repositories\Eloquent\SchemaRepository;
 use ZnSandbox\Sandbox\Office\Domain\Libs\Zip;
 
 class DumpCreateCommand extends Command

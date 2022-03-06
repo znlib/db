@@ -18,7 +18,7 @@ use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Factories\ManagerFactory;
 use ZnLib\Db\Libs\Dependency;
 use ZnLib\Fixture\Domain\Repositories\DbRepository;
-use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
+use ZnLib\Db\Repositories\Eloquent\SchemaRepository;
 use ZnSandbox\Sandbox\Office\Domain\Libs\Zip;
 
 class DumpRestoreCommand extends Command

@@ -3,7 +3,7 @@
 namespace ZnLib\Db\Libs;
 
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
-use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
+use ZnLib\Db\Repositories\Eloquent\SchemaRepository;
 
 class Dependency
 {

@@ -14,8 +14,7 @@ use ZnLib\Console\Symfony4\Helpers\OutputHepler;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZnLib\Fixture\Domain\Services\FixtureService;
-use ZnSandbox\Sandbox\Generator\Domain\Entities\TableEntity;
-use ZnSandbox\Sandbox\Generator\Domain\Repositories\Eloquent\SchemaRepository;
+use ZnLib\Db\Repositories\Eloquent\SchemaRepository;
 
 class DropDatabaseCommand extends Command
 {

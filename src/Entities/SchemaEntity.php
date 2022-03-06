@@ -5,8 +5,8 @@ namespace ZnLib\Db\Entities;
 class SchemaEntity
 {
 
-    private $name;
-    private $dbName;
+    protected $name;
+    protected $dbName;
 
     public function getName()
     {
