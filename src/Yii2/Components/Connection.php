@@ -2,7 +2,7 @@
 
 namespace ZnLib\Db\Yii2\Components;
 
-use ZnLib\Db\Facades\DbFacade;
+use ZnDatabase\Base\Domain\Facades\DbFacade;
 use ZnDatabase\Base\Domain\Helpers\ConfigHelper;
 use ZnLib\Db\Libs\ConfigBuilders\YiiConfigBuilder;
 

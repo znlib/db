@@ -11,6 +11,7 @@ class Bundle extends BaseBundle
     {
         return [
             new \ZnDatabase\Base\Bundle(['all']),
+            new \ZnDatabase\Tool\Bundle(['all']),
         ];
     }
     /*public function console(): array
