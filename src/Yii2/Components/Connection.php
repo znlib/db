@@ -6,6 +6,8 @@ use ZnLib\Db\Facades\DbFacade;
 use ZnLib\Db\Helpers\ConfigHelper;
 use ZnLib\Db\Libs\ConfigBuilders\YiiConfigBuilder;
 
+// todo: переметсить в наработки Yii
+
 class Connection extends \yii\db\Connection
 {
 
