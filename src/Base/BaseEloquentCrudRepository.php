@@ -28,8 +28,8 @@ use ZnCore\Domain\Interfaces\ForgeQueryByFilterInterface;
 use ZnCore\Domain\Interfaces\Repository\CrudRepositoryInterface;
 use ZnCore\Domain\Interfaces\Repository\ReadOneUniqueInterface;
 use ZnCore\Domain\Libs\Query;
-use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
-use ZnLib\Db\Libs\QueryFilter;
+use ZnDatabase\Eloquent\Domain\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
+use ZnDatabase\Base\Domain\Libs\QueryFilter;
 
 abstract class BaseEloquentCrudRepository extends BaseEloquentRepository implements CrudRepositoryInterface, ForgeQueryByFilterInterface, ReadOneUniqueInterface
 {

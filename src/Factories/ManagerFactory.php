@@ -8,8 +8,8 @@ use ZnCore\Base\Legacy\Yii\Helpers\FileHelper;
 use ZnLib\Db\Capsule\Manager;
 use ZnLib\Db\Enums\DbDriverEnum;
 use ZnLib\Db\Facades\DbFacade;
-use ZnLib\Db\Libs\ConfigBuilders\EloquentConfigBuilder;
-use ZnLib\Db\Libs\TableAlias;
+use ZnDatabase\Eloquent\Domain\Libs\ConfigBuilders\EloquentConfigBuilder;
+use ZnDatabase\Base\Domain\Libs\TableAlias;
 
 class ManagerFactory
 {

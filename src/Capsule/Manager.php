@@ -7,7 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
-use ZnLib\Db\Libs\TableAlias;
+use ZnDatabase\Base\Domain\Libs\TableAlias;
 
 class Manager extends CapsuleManager
 {

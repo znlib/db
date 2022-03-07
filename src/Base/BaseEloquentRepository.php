@@ -16,10 +16,10 @@ use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnCore\Domain\Libs\Query;
 use ZnCore\Domain\Traits\EntityManagerTrait;
 use ZnLib\Db\Capsule\Manager;
-use ZnLib\Db\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
-use ZnLib\Db\Traits\EloquentTrait;
-use ZnLib\Db\Traits\MapperTrait;
-use ZnLib\Db\Traits\TableNameTrait;
+use ZnDatabase\Eloquent\Domain\Helpers\QueryBuilder\EloquentQueryBuilderHelper;
+use ZnDatabase\Eloquent\Domain\Traits\EloquentTrait;
+use ZnDatabase\Base\Domain\Traits\MapperTrait;
+use ZnDatabase\Base\Domain\Traits\TableNameTrait;
 
 abstract class BaseEloquentRepository implements GetEntityClassInterface
 {
