@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZnLib\Db\Facades\DbFacade;
-use ZnLib\Db\Factories\ManagerFactory;
+use ZnDatabase\Eloquent\Domain\Factories\ManagerFactory;
 use ZnDatabase\Base\Domain\Repositories\Eloquent\SchemaRepository;
 
 class FixSequenceCommand extends Command

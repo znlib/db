@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnLib\Db\Facades\DbFacade;
-use ZnLib\Db\Factories\ManagerFactory;
+use ZnDatabase\Eloquent\Domain\Factories\ManagerFactory;
 use ZnLib\Fixture\Domain\Entities\FixtureEntity;
 use ZnLib\Console\Symfony4\Helpers\OutputHepler;
 use Symfony\Component\Console\Input\InputInterface;

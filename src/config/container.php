@@ -4,7 +4,7 @@ use Psr\Container\ContainerInterface;
 use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnCore\Domain\Libs\EntityManager;
 use ZnLib\Db\Capsule\Manager;
-use ZnLib\Db\Factories\ManagerFactory;
+use ZnDatabase\Eloquent\Domain\Factories\ManagerFactory;
 
 return [
     'definitions' => [],

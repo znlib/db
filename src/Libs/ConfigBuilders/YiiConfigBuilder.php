@@ -2,7 +2,7 @@
 
 namespace ZnLib\Db\Libs\ConfigBuilders;
 
-use ZnLib\Db\Enums\DbDriverEnum;
+use ZnDatabase\Base\Domain\Enums\DbDriverEnum;
 use ZnLib\Db\Helpers\ConfigHelper;
 
 class YiiConfigBuilder

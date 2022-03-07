@@ -4,7 +4,7 @@ namespace ZnLib\Db\Helpers;
 
 use ZnCore\Base\Legacy\Yii\Helpers\ArrayHelper;
 use ZnCore\Base\Libs\DotEnv\DotEnv;
-use ZnLib\Db\Enums\DbDriverEnum;
+use ZnDatabase\Base\Domain\Enums\DbDriverEnum;
 
 class SqlHelper
 {
