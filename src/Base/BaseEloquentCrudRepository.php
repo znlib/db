@@ -2,6 +2,10 @@
 
 namespace ZnLib\Db\Base;
 
+use ZnCore\Base\Helpers\DeprecateHelper;
+
+DeprecateHelper::softThrow();
+
 /**
  * Class BaseEloquentCrudRepository
  * @package ZnLib\Db\Base

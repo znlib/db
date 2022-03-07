@@ -2,6 +2,8 @@
 
 namespace ZnLib\Db\Helpers;
 
+\ZnCore\Base\Helpers\DeprecateHelper::softThrow();
+
 /**
  * Class ConfigHelper
  * @package ZnLib\Db\Helpers

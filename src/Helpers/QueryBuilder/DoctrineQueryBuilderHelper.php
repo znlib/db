@@ -2,6 +2,8 @@
 
 namespace ZnLib\Db\Helpers\QueryBuilder;
 
+\ZnCore\Base\Helpers\DeprecateHelper::softThrow();
+
 /**
  * Class DoctrineQueryBuilderHelper
  * @package ZnLib\Db\Helpers\QueryBuilder

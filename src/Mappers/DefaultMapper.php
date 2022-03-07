@@ -2,6 +2,8 @@
 
 namespace ZnLib\Db\Mappers;
 
+\ZnCore\Base\Helpers\DeprecateHelper::softThrow();
+
 /**
  * Class DefaultMapper
  * @package ZnLib\Db\Mappers

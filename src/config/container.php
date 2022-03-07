@@ -3,7 +3,7 @@
 use Psr\Container\ContainerInterface;
 use ZnCore\Domain\Interfaces\Libs\EntityManagerInterface;
 use ZnCore\Domain\Libs\EntityManager;
-use ZnLib\Db\Capsule\Manager;
+use ZnDatabase\Eloquent\Domain\Capsule\Manager;
 use ZnDatabase\Eloquent\Domain\Factories\ManagerFactory;
 
 \ZnCore\Base\Helpers\DeprecateHelper::softThrow();
