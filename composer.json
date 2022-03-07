@@ -10,7 +10,9 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "illuminate/database": "^6.3"
+    "zndatabase/base": "dev-main",
+    "zndatabase/eloquent": "dev-main",
+    "zndatabase/backup": "dev-main"
   },
   "autoload": {
     "psr-4": {
