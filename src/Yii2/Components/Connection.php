@@ -3,7 +3,7 @@
 namespace ZnLib\Db\Yii2\Components;
 
 use ZnLib\Db\Facades\DbFacade;
-use ZnLib\Db\Helpers\ConfigHelper;
+use ZnDatabase\Base\Domain\Helpers\ConfigHelper;
 use ZnLib\Db\Libs\ConfigBuilders\YiiConfigBuilder;
 
 // todo: переметсить в наработки Yii

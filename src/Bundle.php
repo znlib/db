@@ -7,7 +7,13 @@ use ZnCore\Base\Libs\App\Base\BaseBundle;
 class Bundle extends BaseBundle
 {
 
-    public function console(): array
+    public function deps(): array
+    {
+        return [
+            new \ZnDatabase\Base\Bundle(['all']),
+        ];
+    }
+    /*public function console(): array
     {
         return [
             'ZnLib\Db\Commands',
@@ -19,5 +25,5 @@ class Bundle extends BaseBundle
         return [
             __DIR__ . '/config/container.php',
         ];
-    }
+    }*/
 }

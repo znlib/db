@@ -6,6 +6,8 @@ use ZnCore\Domain\Libs\EntityManager;
 use ZnLib\Db\Capsule\Manager;
 use ZnDatabase\Eloquent\Domain\Factories\ManagerFactory;
 
+\ZnCore\Base\Helpers\DeprecateHelper::softThrow();
+
 return [
     'definitions' => [],
     'singletons' => [
