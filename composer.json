@@ -10,10 +10,10 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "zndatabase/eloquent": "dev-main",
-    "zndatabase/doctrine": "dev-main",
-    "zndatabase/backup": "dev-main",
-    "zndatabase/tool": "dev-main"
+    "zndatabase/eloquent": "0.x-dev",
+    "zndatabase/doctrine": "0.x-dev",
+    "zndatabase/backup": "0.x-dev",
+    "zndatabase/tool": "0.x-dev"
   },
   "autoload": {
     "psr-4": {
