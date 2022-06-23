@@ -77,7 +77,7 @@ services:
 
 require __DIR__ . '/vendor/autoload.php';
 
-\ZnCore\Base\Libs\DotEnv\DotEnv::init();
+\ZnCore\Base\DotEnv\DotEnv::init();
 
 $eloquentConfigFile = $_ENV['ELOQUENT_CONFIG_FILE'];
 $capsule = new Manager(null, $eloquentConfigFile);
